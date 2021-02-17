@@ -26,12 +26,13 @@ class BaseTransaction {
 
     virtual void encode(Data& data) const;
 
-  protected:
     BaseTransaction(uint32_t typeID, uint32_t networkID, Data &blockchainID, std::vector<TransferableInput> &inputs, std::vector<TransferableOutput> &outputs, Data &memo)
     : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Inputs(inputs), Outputs(outputs), Memo(memo) {
       std::sort(Inputs.begin(), Inputs.end());
       std::sort(Outputs.begin(), Outputs.end());
     }
+  
+  protected:
 
     /// Encodes the BaseTransaction into the provided buffer.
     void baseEncode(Data& data) const;
