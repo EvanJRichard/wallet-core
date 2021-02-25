@@ -22,7 +22,7 @@ public:
     /// Signs a Proto::SigningInput transaction
     static Proto::SigningOutput sign(const Proto::SigningInput& input) noexcept;
     /// Signs the given transaction.
-    static Data sign(const PrivateKey& privateKey, BaseTransaction& transaction) noexcept;
+    static Data sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& transaction) noexcept;
 };
 
 } // namespace TW::Avalanche

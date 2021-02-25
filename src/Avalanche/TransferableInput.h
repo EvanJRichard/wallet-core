@@ -14,6 +14,7 @@ namespace TW::Avalanche {
 
 class TransactionInput{
   public: 
+    const uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
     virtual void encode (Data& data) const;
   protected:
     TransactionInput(){}  
@@ -40,9 +41,9 @@ class TransferableInput {
 
 
 class SECP256k1TransferInput : public TransactionInput {
-  const uint32_t typeID = 5;
   
   public:
+    const uint32_t TypeID = 5;
     uint64_t Amount;
     std::vector<uint32_t> AddressIndices;
 

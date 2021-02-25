@@ -13,36 +13,43 @@ using namespace TW::Avalanche;
 
 
 Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
-    // TODO: Check and finalize implementation
-
     auto protoOutput = Proto::SigningOutput();
-    Data encoded;
-    // auto privateKey = PrivateKey(Data(input.private_key().begin(), input.private_key().end()));
-    // auto signature = privateKey.sign(payload, TWCurveED25519);
-    // encoded = encodeSignature(signature);
-    // EJR Note: Basically, `encoded` needs to be filled with whatever bytes get sent to the network, so the full SignedTransaction
-    // alternatively, could set up to use sign, below, maybe easier to think about
-
+    auto privateKey = PrivateKey(Data(input.private_key().begin(), input.private_key().end()));
+    std::vector<PrivateKey> privateKeys = {privateKey};  //TODO somehow grab private keys from input
+    auto transaction = BaseTransaction(); //TODO somehow build transaction from input, This is kind of a big design question - what should be in proto::signinginput?
+    encoded = sign(privateKeys, transaction);
     protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;
 }
 
-Data Signer::sign(const PrivateKey& privateKey, BaseTransaction& transaction) noexcept {
-    // js version: 
-    //     sign(kc:KeyChain):Tx {
-    //     const txbuff = this.toBuffer();
-    //     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
-    //     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
-    //     return new Tx(this, sigs);
-    // }
-    // cpp pseudo based on js:
+Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& transaction) noexcept {
+    // see avalanchejs/src/apis/avm/basetx.ts and tx.ts for reference implementations
     // get tx bytes
+    Data transactionBytes;
+    transaction.encode(transactionBytes);
     // msgBytes is the sha256 hash of the buffer
-    // signing this msgBytes needs to produce an array of credential. subroutine: 
-        //    // figure out which credential to make: secp or nft
-              // use the key to sign the input bytes, that's a function on privateKey, use TWCurveSECP256k1
-              // build the credential from that (you have a type and a sig, that's what a Credential is constructed with)
+    auto msgBytes = Hash::sha256(transactionBytes);
+    // signing this msgBytes needs to produce an array of credential. TODO key <-> credential association is probably incorrect
+    std::vector<Credential> credentials;
+    for (auto &input : transaction.Inputs) {
+        if (input.Input.TypeID == 5) {
+            //secp input, make an SECP credential
+            std::vector<Data> sigs;
+            for (auto &sigidx: input.AddressIndices) {
+                auto signature = privateKeys[sigidx].sign(msgBytes, TWCurveED25519); // TODO might need smarter key selection than that
+                sigs.push_back(signature);
+            }
+            auto credential = SECP256k1Credential(sigs);
+            credentials.push_back(credential);
+        } else {
+            //nft input, make an NFT credential
+            // TODO define NFT input
+            // TODO add support for NFT inputs
+        }
+    }
     // that gives you the array of credentials to pass to SignedTransaction 
-    // then you encode the SignedTransaction to get the data.
-    return Data{};    
+    auto signedTransaction = SignedTransaction(transaction, credentials);
+    Data outputData;
+    signedTransaction.encode(outputData);
+    return outputData;    
 }
