@@ -17,7 +17,7 @@ class TransactionInput{
     const uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
     virtual void encode (Data& data) const;
   protected:
-    TransactionInput(){}  
+    TransactionInput(): TypeID(0) {}  
 };
 
 /// Avalanche transaction input.
@@ -27,6 +27,7 @@ class TransferableInput {
     uint32_t UTXOIndex;
     Data AssetID;
     TransactionInput Input;
+    std::vector<Address> SpendableAddresses; // corresponding to the Output this came from. not encoded
 
     /// Encodes the input into the provided buffer.
     void encode(Data& data) const;
