@@ -38,7 +38,6 @@ TEST(AvalancheAddress, FromPrivateKey) {
 
 TEST(AvalancheAddress, FromPublicKey) {
     auto publicKey = PublicKey(parse_hex("0x02b33c917f2f6103448d7feb42614037d05928433cb25e78f01a825aa829bb3c27"), TWPublicKeyTypeSECP256k1);
-    std::cout << "testing pubkey " << "0x02b33c917f2f6103448d7feb42614037d05928433cb25e78f01a825aa829bb3c27" << std::endl;
     auto address = Address(publicKey);
     ASSERT_EQ(address.string(), "X-avax1apmh7wxg3js48fhacfv5y9md9065jxuft30vup");
 }
