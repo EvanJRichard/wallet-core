@@ -16,7 +16,7 @@ Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
     auto protoOutput = Proto::SigningOutput();
     auto privateKey = PrivateKey(Data(input.private_key().begin(), input.private_key().end()));
     std::vector<PrivateKey> privateKeys = {privateKey};  //TODO somehow grab private keys from input
-    auto transaction = BaseTransaction(); //TODO somehow build transaction from input, This is kind of a big design question - what should be in proto::signinginput?
+    auto transaction = BaseTransaction(); //TODO somehow build transaction from input, This is kind of a big design question - what should be in proto::signinginput? maybe informed by what helpers we use
     encoded = sign(privateKeys, transaction);
     protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;
@@ -35,9 +35,17 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
         if (input.Input.TypeID == 5) {
             //secp input, make an SECP credential
             std::vector<Data> sigs;
-            for (auto &sigidx: input.AddressIndices) {
-                auto signature = privateKeys[sigidx].sign(msgBytes, TWCurveED25519); // TODO might need smarter key selection than that
-                sigs.push_back(signature);
+            for (auto &sigidx: input.Input.AddressIndices) { // TODO we can infer this is a SECP256 input, how can we cast to satisfy?
+                auto addresses = input.SpendableAddresses;
+                std::sort(addresses.begin(), addresses.end());
+                auto addressRequested = addresses[sigidx];
+                for (auto &key : privateKeys) {
+                    auto possibleAddress = Address(key.getPublicKey(TWPublicKeyTypeSECP256k1));
+                    if (possibleAddress == addressRequested) {
+                        auto signature = key.sign(msgBytes, TWCurveED25519); 
+                        sigs.push_back(signature);
+                    }
+                }
             }
             auto credential = SECP256k1Credential(sigs);
             credentials.push_back(credential);
