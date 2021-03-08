@@ -101,7 +101,7 @@ message NFTTransferOp {
 message TransferOp {
     oneof operation {
         SECP256K1MintOperation secp_mint_op = 1;
-        NFTMintOperation nft_mint_op = 2;
+        NFTMintOp nft_mint_op = 2;
         NFTTransferOp nft_transfer_op = 3;
     }
 }
@@ -135,8 +135,8 @@ message BaseTx {
 message CreateAssetTx {
     BaseTx base_tx = 1;                       // size(base_tx)
     string name = 2;                          // 2 bytes + len(name)
-    name symbol = 3;                          // 2 bytes + len(symbol)
-    uint8 denomination = 4;                   // 1 bytes
+    string symbol = 3;                          // 2 bytes + len(symbol)
+    uint32 denomination = 4;                   // 1 bytes NOTE: this should be a uint8 when encoding to a byte format recognized by the avalanche network, not uint32
     repeated InitialState initial_states = 5; // 4 bytes + size(initial_states)
 }
 
@@ -173,7 +173,7 @@ message Credential {
 }
 
 message SignedTx {
-    uint16 codec_id = 1;                 // 2 bytes
+    uint32 codec_id = 1;                 // 2 bytes NOTE: this should be a uint16 when encoding to a serialization format recognized by the Avalanche network, not 32
     UnsignedTx unsigned_tx = 2;          // size(unsigned_tx)
     repeated Credential credentials = 3; // 4 bytes + size(credentials)
 }
