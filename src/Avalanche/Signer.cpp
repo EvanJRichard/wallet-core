@@ -16,8 +16,10 @@ Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
     auto protoOutput = Proto::SigningOutput();
     auto privateKey = PrivateKey(Data(input.private_key().begin(), input.private_key().end()));
     std::vector<PrivateKey> privateKeys = {privateKey};  //TODO somehow grab private keys from input
+
     auto transaction = BaseTransaction(); //TODO somehow build transaction from input, This is kind of a big design question - what should be in proto::signinginput? maybe informed by what helpers we use
-    encoded = sign(privateKeys, transaction);
+        
+    auto encoded = sign(privateKeys, transaction);
     protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;
 }
