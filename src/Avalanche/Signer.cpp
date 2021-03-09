@@ -11,15 +11,64 @@
 using namespace TW;
 using namespace TW::Avalanche;
 
+BaseTransaction buildBaseTx(const Proto::SigningInput &input) noexcept {
+    
+}
+
+UnsignedCreateAssetTransaction buildCreateAssetTx(const Proto::SigningInput &input) noexcept {
+    
+}
+
+UnsignedExportTransaction buildExportTx(const Proto::SigningInput &input) noexcept {
+    
+}
+
+UnsignedImportTransaction buildImportTx(const Proto::SigningInput &input) noexcept {
+    
+}
+
+UnsignedOperationTransaction buildOperationTx(const Proto::SigningInput &input) noexcept {
+    
+}
+
 
 Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
     auto protoOutput = Proto::SigningOutput();
-    auto privateKey = PrivateKey(Data(input.private_key().begin(), input.private_key().end()));
-    std::vector<PrivateKey> privateKeys = {privateKey};  //TODO somehow grab private keys from input
 
-    auto transaction = BaseTransaction(); //TODO somehow build transaction from input, This is kind of a big design question - what should be in proto::signinginput? maybe informed by what helpers we use
-        
-    auto encoded = sign(privateKeys, transaction);
+    std::vector<PrivateKey> privateKeys;
+    for (auto& privateKeyBytes : input.private_keys()) {
+        auto privateKey = PrivateKey(Data(privateKeyBytes.begin(), privateKeyBytes.end()));
+        privateKeys.push_back(privateKey);
+    }
+
+    Data encoded;
+    switch (input.input_tx().tx_case()) {
+    case Proto::UnsignedTx::TxCase::kBaseTx: {
+        auto transaction = buildBaseTx(input);
+        transaction.encode(encoded);
+    }
+        return;
+    case Proto::UnsignedTx::TxCase::kCreateAssetTx: {
+        auto transaction = buildCreateAssetTx(input);
+        transaction.encode(encoded);
+    }
+        return;
+    case Proto::UnsignedTx::TxCase::kExportTx: {
+        auto transaction = buildExportTx(input);
+        transaction.encode(encoded);
+    }
+        return;
+    case Proto::UnsignedTx::TxCase::kImportTx: {
+        auto transaction = buildImportTx(input);
+        transaction.encode(encoded);
+    }
+        return;
+    case Proto::UnsignedTx::TxCase::kOperationTx: {
+        auto transaction = buildOperationTx(input);
+        transaction.encode(encoded);
+    }
+        return;
+    }
     protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;
 }
@@ -37,7 +86,7 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
         if (input.Input.TypeID == 5) {
             //secp input, make an SECP credential
             std::vector<Data> sigs;
-            for (auto &sigidx: input.Input.AddressIndices) { // TODO we can infer this is a SECP256 input, how can we cast to satisfy?
+            for (auto &sigidx: input.Input.AddressIndices) { 
                 auto addresses = input.SpendableAddresses;
                 std::sort(addresses.begin(), addresses.end());
                 auto addressRequested = addresses[sigidx];

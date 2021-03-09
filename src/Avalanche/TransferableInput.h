@@ -15,9 +15,10 @@ namespace TW::Avalanche {
 class TransactionInput{
   public: 
     const uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
+    std::vector<uint32_t> AddressIndices;
     virtual void encode (Data& data) const;
   protected:
-    TransactionInput(): TypeID(0) {}  
+    TransactionInput(): TypeID(0), AddressIndices() {}  
 };
 
 /// Avalanche transaction input.
@@ -46,10 +47,10 @@ class SECP256k1TransferInput : public TransactionInput {
   public:
     const uint32_t TypeID = 5;
     uint64_t Amount;
-    std::vector<uint32_t> AddressIndices;
 
     SECP256k1TransferInput(uint64_t amount, std::vector<uint32_t> addressIndices)
-      : Amount(amount), AddressIndices(addressIndices) {
+      : Amount(amount) {
+        AddressIndices = addressIndices;
         std::sort(AddressIndices.begin(), AddressIndices.end());
       }
   
