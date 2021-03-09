@@ -7,7 +7,7 @@
 #pragma once
 
 #include "../Data.h"
-
+#include "Address.h"
 #include <vector>
 
 namespace TW::Avalanche {
