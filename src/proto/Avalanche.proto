@@ -186,14 +186,12 @@ message TransferMessage {
 
 // TODO: Input data necessary to create a signed transaction.
 message SigningInput {
-    bytes private_key = 1;
-
-    repeated bytes private_keys = 2; //TODO can we just use private_keys or is private_key singular necessary
-
-    UnsignedTx input_tx = 3; 
+    repeated bytes private_keys = 1;
+    
+    UnsignedTx input_tx = 2; 
 
     oneof message_oneof {
-        TransferMessage transfer = 4; // TODO can we remove this oneof or is this a necessary TW interface
+        TransferMessage transfer = 3; // TODO can we remove this oneof or is this a necessary TW interface
     }
 }
 
