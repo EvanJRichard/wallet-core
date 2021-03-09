@@ -10,7 +10,11 @@
 
 using namespace TW::Avalanche;
 
-void BaseTransaction::baseEncode(Data& data) const {
+void BaseTransaction::encode(Data& data) const {
+    baseEncode(data); 
+}
+
+void BaseTransaction::baseEncode(Data& data) const { // TODO baseEncode is a relic of a previous class structure, can subclasses just call super::encode or something, eliminating the need for baseEncode?
     encode32LE(TypeID, data);
     encode32LE(NetworkID, data);
     for (auto byte : BlockchainID) {

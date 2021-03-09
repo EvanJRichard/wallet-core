@@ -12,11 +12,11 @@
 
 namespace TW::Avalanche {
 
-class TransactionInput{
+class TransactionInput{ //TODO user-devs should never actually make a TransactionInput, we want this to be an Interface or something
   public: 
-    const uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
+    uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
     std::vector<uint32_t> AddressIndices;
-    virtual void encode (Data& data) const;
+    // void encode (Data& data) const; //we want to enforce that all subclasses can encode
   protected:
     TransactionInput(): TypeID(0), AddressIndices() {}  
 };
@@ -45,7 +45,7 @@ class TransferableInput {
 class SECP256k1TransferInput : public TransactionInput {
   
   public:
-    const uint32_t TypeID = 5;
+    uint32_t TypeID = 5; 
     uint64_t Amount;
 
     SECP256k1TransferInput(uint64_t amount, std::vector<uint32_t> addressIndices)

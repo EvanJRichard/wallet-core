@@ -24,7 +24,7 @@ class BaseTransaction {
     std::vector<TransferableOutput> Outputs;
     Data Memo;
 
-    virtual void encode(Data& data) const;
+    void encode(Data& data) const;
 
     BaseTransaction(uint32_t typeID, uint32_t networkID, Data &blockchainID, std::vector<TransferableInput> &inputs, std::vector<TransferableOutput> &outputs, Data &memo)
     : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Inputs(inputs), Outputs(outputs), Memo(memo) {

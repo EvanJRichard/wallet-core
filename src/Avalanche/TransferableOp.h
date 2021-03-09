@@ -13,10 +13,10 @@
 
 namespace TW::Avalanche {
 
-class TransactionOp {
+class TransactionOp { //TODO user-devs should never directly make a TransactionOp, we want this to be an interface or something
   public:
     /// Encodes the op into the provided buffer.
-    virtual void encode(Data& data) const;
+    // void encode(Data& data) const;  //we want to enforce that all subclasses can encode
   protected:
     TransactionOp(){}
 };

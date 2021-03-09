@@ -47,27 +47,27 @@ Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
         auto transaction = buildBaseTx(input);
         transaction.encode(encoded);
     }
-        return;
+        break;
     case Proto::UnsignedTx::TxCase::kCreateAssetTx: {
         auto transaction = buildCreateAssetTx(input);
         transaction.encode(encoded);
     }
-        return;
+        break;
     case Proto::UnsignedTx::TxCase::kExportTx: {
         auto transaction = buildExportTx(input);
         transaction.encode(encoded);
     }
-        return;
+        break;
     case Proto::UnsignedTx::TxCase::kImportTx: {
         auto transaction = buildImportTx(input);
         transaction.encode(encoded);
     }
-        return;
+        break;
     case Proto::UnsignedTx::TxCase::kOperationTx: {
         auto transaction = buildOperationTx(input);
         transaction.encode(encoded);
     }
-        return;
+        break;
     }
     protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;

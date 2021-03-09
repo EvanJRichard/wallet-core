@@ -12,10 +12,10 @@
 
 namespace TW::Avalanche {
 
-class TransactionOutput {
+class TransactionOutput { // TODO user-devs should never actually make a TransactionOutput, we want this to be an Interface or something
   public:
     /// Encodes the output into the provided buffer.
-    virtual void encode(Data& data) const;
+    // void encode(Data& data) const; // we want to enforce that all subclasses can encode
 
     bool operator<(const TransactionOutput& other) const;
 
