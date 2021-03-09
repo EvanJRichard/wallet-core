@@ -22,7 +22,7 @@ void TransferableOutput::encode(Data& data) const {
     for (auto byte : AssetID) {
         data.push_back(byte);
     }
-    Output.encode(data);
+    Output->encode(data);
 }
 
 bool TransferableOutput::operator<(const TransferableOutput& other) const {

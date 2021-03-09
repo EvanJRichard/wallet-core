@@ -12,13 +12,14 @@
 
 namespace TW::Avalanche {
 
-class TransactionInput{ //TODO user-devs should never actually make a TransactionInput, we want this to be an Interface or something
+class TransactionInput{
   public: 
-    uint32_t TypeID; // TODO turn these various TypeIDs into enums; and review where they live/class structure
-    std::vector<uint32_t> AddressIndices;
-    // void encode (Data& data) const; //we want to enforce that all subclasses can encode
+    virtual std::vector<uint32_t> getAddressIndices() const = 0;
+    virtual uint32_t getTypeID() const = 0;
+    virtual void encode (Data& data) const = 0; //we want to enforce that all subclasses can encode
   protected:
-    TransactionInput(): TypeID(0), AddressIndices() {}  
+    TransactionInput() {}
+    virtual ~TransactionInput() {}
 };
 
 /// Avalanche transaction input.
@@ -27,7 +28,7 @@ class TransferableInput {
     Data TxID;
     uint32_t UTXOIndex;
     Data AssetID;
-    TransactionInput Input;
+    TransactionInput* Input;
     std::vector<Address> SpendableAddresses; // corresponding to the Output this came from. not encoded
 
     /// Encodes the input into the provided buffer.
@@ -35,7 +36,7 @@ class TransferableInput {
 
     TransferableInput(Data &txid, uint32_t utxoIndex, Data &assetID, TransactionInput &input)
         : TxID(txid) , UTXOIndex(utxoIndex)
-        , AssetID(assetID), Input(input) {}
+        , AssetID(assetID), Input(&input) {}
 
     
     bool operator<(const TransferableInput& other) const;
@@ -43,10 +44,11 @@ class TransferableInput {
 
 
 class SECP256k1TransferInput : public TransactionInput {
-  
-  public:
     uint32_t TypeID = 5; 
     uint64_t Amount;
+    std::vector<uint32_t> AddressIndices;
+  
+  public:
 
     SECP256k1TransferInput(uint64_t amount, std::vector<uint32_t> addressIndices)
       : Amount(amount) {
@@ -55,6 +57,9 @@ class SECP256k1TransferInput : public TransactionInput {
       }
   
     void encode (Data& data) const;
+
+    std::vector<uint32_t> getAddressIndices() const {return AddressIndices;}
+    uint32_t getTypeID() const {return TypeID;}
 };
 
 } // namespace TW::Avalanche

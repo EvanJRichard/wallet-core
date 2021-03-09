@@ -83,10 +83,10 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
     // signing this msgBytes needs to produce an array of credential. TODO key <-> credential association is probably incorrect
     std::vector<Credential> credentials;
     for (auto &input : transaction.Inputs) {
-        if (input.Input.TypeID == 5) {
+        if (input.Input->getTypeID() == 5) {
             //secp input, make an SECP credential
             std::vector<Data> sigs;
-            for (auto &sigidx: input.Input.AddressIndices) { 
+            for (auto &sigidx: input.Input->getAddressIndices()) { 
                 auto addresses = input.SpendableAddresses;
                 std::sort(addresses.begin(), addresses.end());
                 auto addressRequested = addresses[sigidx];

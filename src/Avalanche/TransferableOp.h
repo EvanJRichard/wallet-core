@@ -13,12 +13,13 @@
 
 namespace TW::Avalanche {
 
-class TransactionOp { //TODO user-devs should never directly make a TransactionOp, we want this to be an interface or something
+class TransactionOp {
   public:
     /// Encodes the op into the provided buffer.
-    // void encode(Data& data) const;  //we want to enforce that all subclasses can encode
+    virtual void encode(Data& data) const = 0;  //we want to enforce that all subclasses can encode
   protected:
     TransactionOp(){}
+    virtual ~TransactionOp(){}
 };
 
 /// Avalanche transaction operation.
@@ -32,13 +33,13 @@ class TransferableOp {
     static bool sortUTXOIDs(UTXOID lhs, UTXOID rhs);
   public:
     Data AssetID;
-    TransactionOp TransferOp;
+    TransactionOp* TransferOp;
 
     /// Encodes the op into the provided buffer.
     void encode(Data& data) const;
 
     TransferableOp(Data &assetID, std::vector<UTXOID> &utxoIDs, TransactionOp &transferOp)
-      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(transferOp) {
+      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(&transferOp) {
         std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
       }
 
@@ -65,12 +66,12 @@ class SECP256k1MintOperation : TransactionOp {
 class NFTMintOperation : TransactionOp {
   private:
     uint32_t typeID = 12;
+    std::vector<Output> Outputs; 
   public: 
     std::vector<uint32_t> AddressIndices;
     uint32_t GroupID;
     Data Payload;
 
-    std::vector<Output> Outputs; 
 
     NFTMintOperation(std::vector<uint32_t> &addressIndices, uint32_t groupID, Data &payload, std::vector<Output> &outputs)
     : AddressIndices(addressIndices), GroupID(groupID), Payload(payload), Outputs(outputs) {

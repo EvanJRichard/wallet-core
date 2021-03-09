@@ -10,11 +10,8 @@
 
 using namespace TW::Avalanche;
 
-void BaseTransaction::encode(Data& data) const {
-    baseEncode(data); 
-}
 
-void BaseTransaction::baseEncode(Data& data) const { // TODO baseEncode is a relic of a previous class structure, can subclasses just call super::encode or something, eliminating the need for baseEncode?
+void BaseTransaction::encode(Data& data) const {
     encode32LE(TypeID, data);
     encode32LE(NetworkID, data);
     for (auto byte : BlockchainID) {
@@ -34,7 +31,7 @@ void BaseTransaction::baseEncode(Data& data) const { // TODO baseEncode is a rel
 }
 
 void UnsignedCreateAssetTransaction::encode(Data& data) const {
-    baseEncode(data);
+    BaseTransaction::encode(data);
     encodeString(Name, data);
     encodeString(Symbol, data);
     data.push_back(Denomination);
@@ -45,7 +42,7 @@ void UnsignedCreateAssetTransaction::encode(Data& data) const {
 }
 
 void UnsignedOperationTransaction::encode(Data& data) const {
-    baseEncode(data);
+    BaseTransaction::encode(data);
     encode32LE(Operations.size(), data);
     for (auto op : Operations) {
         op.encode(data);
@@ -53,7 +50,7 @@ void UnsignedOperationTransaction::encode(Data& data) const {
 }
 
 void UnsignedImportTransaction::encode(Data& data) const {
-    baseEncode(data);
+    BaseTransaction::encode(data);
     for (auto byte : SourceChain) {
         data.push_back(byte);
     }
@@ -64,7 +61,7 @@ void UnsignedImportTransaction::encode(Data& data) const {
 }
 
 void UnsignedExportTransaction::encode(Data& data) const {
-    baseEncode(data);
+    BaseTransaction::encode(data);
     for (auto byte : DestinationChain) {
         data.push_back(byte);
     }

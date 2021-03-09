@@ -18,7 +18,7 @@ void TransferableInput::encode(Data& data) const {
     for (auto byte : AssetID) {
         data.push_back(byte);
     }
-    Input.encode(data);
+    Input->encode(data);
 }
 
 bool TransferableInput::operator<(const TransferableInput& other) const {

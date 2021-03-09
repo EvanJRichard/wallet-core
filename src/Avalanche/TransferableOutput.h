@@ -12,28 +12,29 @@
 
 namespace TW::Avalanche {
 
-class TransactionOutput { // TODO user-devs should never actually make a TransactionOutput, we want this to be an Interface or something
+class TransactionOutput {
   public:
     /// Encodes the output into the provided buffer.
-    // void encode(Data& data) const; // we want to enforce that all subclasses can encode
+    virtual void encode(Data& data) const = 0;
 
     bool operator<(const TransactionOutput& other) const;
 
   protected:
     TransactionOutput(){}
+    virtual ~TransactionOutput(){}
 };
 
 /// Avalanche transaction output.
 class TransferableOutput {
   public:
     Data AssetID;
-    TransactionOutput Output;
+    TransactionOutput* Output;
 
     /// Encodes the output into the provided buffer.
     void encode(Data& data) const;
 
     TransferableOutput(Data &assetID, TransactionOutput &output)
-      : AssetID(assetID), Output(output) {}
+      : AssetID(assetID), Output(&output) {}
     
     bool operator<(const TransferableOutput& other) const;
       

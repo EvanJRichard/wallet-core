@@ -15,7 +15,6 @@
 using namespace TW::Avalanche;
 
 bool Address::isValid(const std::string& string) {
-    std::cout << "testing " << string << std::endl;
     // split into before and after - 
     auto hyphenPos = string.find("-");
     if (hyphenPos == std::string::npos) {

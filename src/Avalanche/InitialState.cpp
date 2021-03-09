@@ -14,7 +14,7 @@ void InitialState::encode(Data& data) const {
     encode32LE(FxID, data);
     encode32LE(Outputs.size(), data);
     for (auto output : Outputs) {
-        output.encode(data);
+        output->encode(data);
     }
 }
 

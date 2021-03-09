@@ -28,7 +28,7 @@ void TransferableOp::encode(Data& data) const {
         }
         encode32LE(utxoID.second, data);
     }
-    TransferOp.encode(data);
+    TransferOp->encode(data);
 }
 
 bool TransferableOp::operator<(const TransferableOp& other) const {
