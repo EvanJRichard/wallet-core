@@ -89,7 +89,7 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
             for (auto &sigidx: input.Input->getAddressIndices()) { 
                 auto addresses = input.SpendableAddresses;
                 std::sort(addresses.begin(), addresses.end());
-                auto addressRequested = addresses[sigidx];
+                auto addressRequested = addresses[sigidx]; // TODO this access is not guaranteed to be safe.
                 for (auto &key : privateKeys) {
                     auto possibleAddress = Address(key.getPublicKey(TWPublicKeyTypeSECP256k1));
                     if (possibleAddress == addressRequested) {

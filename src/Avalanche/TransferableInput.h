@@ -34,9 +34,11 @@ class TransferableInput {
     /// Encodes the input into the provided buffer.
     void encode(Data& data) const;
 
-    TransferableInput(Data &txid, uint32_t utxoIndex, Data &assetID, TransactionInput &input)
-        : TxID(txid) , UTXOIndex(utxoIndex)
-        , AssetID(assetID), Input(&input) {}
+    TransferableInput(Data &txid, uint32_t utxoIndex, Data &assetID, TransactionInput &input, std::vector<Address> &spendableAddresses)
+        : TxID(txid) , UTXOIndex(utxoIndex), AssetID(assetID), Input(&input), SpendableAddresses(spendableAddresses)
+         {
+           std::sort(SpendableAddresses.begin(), SpendableAddresses.end());
+         }
 
     
     bool operator<(const TransferableInput& other) const;
