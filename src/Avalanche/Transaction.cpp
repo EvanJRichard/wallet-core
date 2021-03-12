@@ -12,19 +12,20 @@ using namespace TW::Avalanche;
 
 
 void BaseTransaction::encode(Data& data) const {
-    encode32LE(TypeID, data);
-    encode32LE(NetworkID, data);
+    encode32BE(TypeID, data);
+    encode32BE(NetworkID, data);
     for (auto byte : BlockchainID) {
         data.push_back(byte);
     }
-    encode32LE(Outputs.size(), data);
+    encode32BE(Outputs.size(), data);
     for (auto output : Outputs) {
         output.encode(data);
     }
-    encode32LE(Inputs.size(), data);
+    encode32BE(Inputs.size(), data);
     for (auto input : Inputs) {
         input.encode(data);
     }
+    encode32BE(Memo.size(), data);
     for (auto byte : Memo) {
         data.push_back(byte);
     }
@@ -35,7 +36,7 @@ void UnsignedCreateAssetTransaction::encode(Data& data) const {
     encodeString(Name, data);
     encodeString(Symbol, data);
     data.push_back(Denomination);
-    encode32LE(InitialStates.size(), data);
+    encode32BE(InitialStates.size(), data);
     for (auto state : InitialStates) {
         state.encode(data);
     }
@@ -43,7 +44,7 @@ void UnsignedCreateAssetTransaction::encode(Data& data) const {
 
 void UnsignedOperationTransaction::encode(Data& data) const {
     BaseTransaction::encode(data);
-    encode32LE(Operations.size(), data);
+    encode32BE(Operations.size(), data);
     for (auto op : Operations) {
         op.encode(data);
     }
@@ -54,7 +55,7 @@ void UnsignedImportTransaction::encode(Data& data) const {
     for (auto byte : SourceChain) {
         data.push_back(byte);
     }
-    encode32LE(ImportInputs.size(), data);
+    encode32BE(ImportInputs.size(), data);
     for (auto in : ImportInputs) {
         in.encode(data);
     }
@@ -65,17 +66,17 @@ void UnsignedExportTransaction::encode(Data& data) const {
     for (auto byte : DestinationChain) {
         data.push_back(byte);
     }
-    encode32LE(ExportOutputs.size(), data);
+    encode32BE(ExportOutputs.size(), data);
     for (auto out : ExportOutputs) {
         out.encode(data);
     }
 }
 
 void SignedTransaction::encode(Data& data) const {
-    encode16LE(CodecID, data);
+    encode16BE(CodecID, data);
     UnsignedTransaction.encode(data);
     // do not sort Credentials, they will be paired with inputs by index
-    encode32LE(Credentials.size(), data);
+    encode32BE(Credentials.size(), data);
     for (auto cred : Credentials) {
         cred.encode(data);
     }

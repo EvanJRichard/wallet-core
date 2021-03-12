@@ -28,6 +28,7 @@ class BaseTransaction {
 
     BaseTransaction(uint32_t typeID, uint32_t networkID, Data &blockchainID, std::vector<TransferableInput> &inputs, std::vector<TransferableOutput> &outputs, Data &memo)
     : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Memo(memo) {
+      //TODO guard rails and validation would be nice here; for example BlockchainID must be 32 bytes; assetID must be 4 bytes, networkID 4 bytes.
       Inputs = inputs;
       Outputs = outputs;
       std::sort(Inputs.begin(), Inputs.end());

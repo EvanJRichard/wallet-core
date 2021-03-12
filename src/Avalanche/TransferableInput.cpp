@@ -14,7 +14,7 @@ void TransferableInput::encode(Data& data) const {
     for (auto byte : TxID) {
         data.push_back(byte);
     }
-    encode32LE(UTXOIndex, data);
+    encode32BE(UTXOIndex, data);
     for (auto byte : AssetID) {
         data.push_back(byte);
     }
@@ -37,9 +37,9 @@ bool TransferableInput::operator<(const TransferableInput& other) const {
 }
 
 void SECP256k1TransferInput::encode(Data& data) const {
-    encode32LE(TypeID, data);
-    encode64LE(Amount, data);
+    encode32BE(TypeID, data);
+    encode64BE(Amount, data);
     for (auto index: AddressIndices) {
-        encode32LE(index, data);
+        encode32BE(index, data);
     }
 }
