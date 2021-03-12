@@ -77,6 +77,9 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
     // see avalanchejs/src/apis/avm/basetx.ts and tx.ts for reference implementations
     // get tx bytes
     Data transactionBytes;
+    // TODO this is probably not the best place to store and add the codecID bytes...?
+    transactionBytes.push_back(0x00); // first codecID byte: 0x00
+    transactionBytes.push_back(0x00); // second codecID byte: 0x00
     transaction.encode(transactionBytes);
     // msgBytes is the sha256 hash of the buffer
     auto msgBytes = Hash::sha256(transactionBytes);
@@ -91,9 +94,9 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
                 std::sort(addresses.begin(), addresses.end());
                 auto addressRequested = addresses[sigidx]; // TODO this access is not guaranteed to be safe.
                 for (auto &key : privateKeys) {
-                    auto possibleAddress = Address(key.getPublicKey(TWPublicKeyTypeSECP256k1));
+                    auto possibleAddress = Address(key.getPublicKey(TWPublicKeyTypeSECP256k1)); 
                     if (possibleAddress == addressRequested) {
-                        auto signature = key.sign(msgBytes, TWCurveED25519); 
+                        auto signature = key.sign(msgBytes, TWCurveSECP256k1); // TODO EJR I thought this was TWCurveED25519 for sure
                         sigs.push_back(signature);
                     }
                 }
