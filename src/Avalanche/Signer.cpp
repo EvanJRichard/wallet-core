@@ -41,49 +41,49 @@ Proto::SigningOutput Signer::sign(const Proto::SigningInput &input) noexcept {
         privateKeys.push_back(privateKey);
     }
 
-    Data encoded;
     switch (input.input_tx().tx_case()) {
     case Proto::UnsignedTx::TxCase::kBaseTx: {
         auto transaction = buildBaseTx(input);
-        transaction.encode(encoded);
+        auto encoded = Signer::sign(privateKeys, transaction);
+        protoOutput.set_encoded(encoded.data(), encoded.size());
     }
         break;
     case Proto::UnsignedTx::TxCase::kCreateAssetTx: {
         auto transaction = buildCreateAssetTx(input);
-        transaction.encode(encoded);
+        auto encoded = Signer::sign(privateKeys, transaction);
+        protoOutput.set_encoded(encoded.data(), encoded.size());
     }
         break;
     case Proto::UnsignedTx::TxCase::kExportTx: {
         auto transaction = buildExportTx(input);
-        transaction.encode(encoded);
+        auto encoded = Signer::sign(privateKeys, transaction);
+        protoOutput.set_encoded(encoded.data(), encoded.size());
     }
         break;
     case Proto::UnsignedTx::TxCase::kImportTx: {
         auto transaction = buildImportTx(input);
-        transaction.encode(encoded);
+        auto encoded = Signer::sign(privateKeys, transaction);
+        protoOutput.set_encoded(encoded.data(), encoded.size());
     }
         break;
     case Proto::UnsignedTx::TxCase::kOperationTx: {
         auto transaction = buildOperationTx(input);
-        transaction.encode(encoded);
+        auto encoded = Signer::sign(privateKeys, transaction);
+        protoOutput.set_encoded(encoded.data(), encoded.size());
     }
         break;
     }
-    protoOutput.set_encoded(encoded.data(), encoded.size());
     return protoOutput;
 }
 
 Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& transaction) noexcept {
     // see avalanchejs/src/apis/avm/basetx.ts and tx.ts for reference implementations
-    // get tx bytes
     Data transactionBytes;
     // TODO this is probably not the best place to store and add the codecID bytes...?
     transactionBytes.push_back(0x00); // first codecID byte: 0x00
     transactionBytes.push_back(0x00); // second codecID byte: 0x00
     transaction.encode(transactionBytes);
-    // msgBytes is the sha256 hash of the buffer
     auto msgBytes = Hash::sha256(transactionBytes);
-    // signing this msgBytes needs to produce an array of credential. TODO key <-> credential association is probably incorrect
     std::vector<Credential> credentials;
     for (auto &input : transaction.Inputs) {
         if (input.Input->getTypeID() == 5) {
@@ -109,7 +109,6 @@ Data Signer::sign(const std::vector<PrivateKey>& privateKeys, BaseTransaction& t
             // TODO add support for NFT inputs
         }
     }
-    // that gives you the array of credentials to pass to SignedTransaction 
     auto signedTransaction = SignedTransaction(transaction, credentials);
     Data outputData;
     signedTransaction.encode(outputData);
