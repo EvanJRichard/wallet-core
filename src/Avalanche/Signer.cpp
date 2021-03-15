@@ -145,7 +145,7 @@ std::vector<TransferableOp> structToOperations(google::protobuf::RepeatedPtrFiel
                 // end build transfer output
 
                 auto transactionOp = SECP256k1MintOperation(addressIndices, mintOutput, tferOutput);
-                auto transferableOp = TransferableOp(assetID, utxoIDs, &transactionOp);
+                auto transferableOp = TransferableOp(assetID, utxoIDs, transactionOp);
                 ops.push_back(transferableOp);
                 break;
             }
