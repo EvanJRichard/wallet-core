@@ -51,6 +51,12 @@ class UnsignedCreateAssetTransaction : public BaseTransaction {
       Name(name), Symbol(symbol), Denomination(denomination), InitialStates(states) {
         std::sort(InitialStates.begin(), InitialStates.end());
       }
+
+    UnsignedCreateAssetTransaction(BaseTransaction &baseTxn, std::string &name, std::string &symbol, uint8_t denomination, std::vector<InitialState> &states)
+      : BaseTransaction(baseTxn), 
+      Name(name), Symbol(symbol), Denomination(denomination), InitialStates(states) {
+        std::sort(InitialStates.begin(), InitialStates.end());
+      }
 };
 
 class UnsignedOperationTransaction : public BaseTransaction {
