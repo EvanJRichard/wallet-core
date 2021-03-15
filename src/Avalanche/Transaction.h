@@ -71,6 +71,11 @@ class UnsignedOperationTransaction : public BaseTransaction {
       Operations(ops) {
         std::sort(Operations.begin(), Operations.end());
       }
+
+    UnsignedOperationTransaction(BaseTransaction &baseTxn, std::vector<TransferableOp> &ops)
+    : BaseTransaction(baseTxn), Operations(ops) {
+      std::sort(Operations.begin(), Operations.end());
+    }
 };
 
 class UnsignedImportTransaction : public BaseTransaction {
@@ -83,7 +88,12 @@ class UnsignedImportTransaction : public BaseTransaction {
     UnsignedImportTransaction(uint32_t networkID, Data &blockchainID, std::vector<TransferableInput> &inputs, std::vector<TransferableOutput> &outputs, Data &memo, 
       Data &source, std::vector<TransferableInput> &importInputs)
       : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo), 
-      SourceChain(source), ImportInputs(inputs) {
+      SourceChain(source), ImportInputs(importInputs) {
+        std::sort(ImportInputs.begin(), ImportInputs.end());
+      }
+
+    UnsignedImportTransaction(BaseTransaction &baseTxn, Data &source, std::vector<TransferableInput> importInputs)
+      : BaseTransaction(baseTxn), SourceChain(source), ImportInputs(importInputs) {
         std::sort(ImportInputs.begin(), ImportInputs.end());
       }
 };
@@ -99,6 +109,11 @@ class UnsignedExportTransaction : public BaseTransaction {
       Data &dest, std::vector<TransferableOutput> &exportOutputs)
       : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo), 
       DestinationChain(dest), ExportOutputs(exportOutputs) {
+        std::sort(ExportOutputs.begin(), ExportOutputs.end());
+      }
+
+    UnsignedExportTransaction(BaseTransaction &baseTxn, Data &dest, std::vector<TransferableOutput> &exportOutputs)
+      : BaseTransaction(baseTxn), DestinationChain(dest), ExportOutputs(exportOutputs) {
         std::sort(ExportOutputs.begin(), ExportOutputs.end());
       }
 };
