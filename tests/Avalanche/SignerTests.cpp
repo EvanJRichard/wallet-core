@@ -23,8 +23,7 @@ using namespace TW::Avalanche;
 
 TEST(AvalancheSigner, SignWithLocktimeThreshold) {
     const auto privateKeyOneBytes = CB58::avalanche.decode("ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN");
-    // we just want the first 32 bytes
-    const std::vector<uint8_t> privateKeyOneBytesNoChecksum(privateKeyOneBytes.begin(), privateKeyOneBytes.begin() + 32);
+    const std::vector<uint8_t> privateKeyOneBytesNoChecksum(privateKeyOneBytes.begin(), privateKeyOneBytes.begin() + 32); // we just want the first 32 bytes
     const auto privateKeyOne = PrivateKey(privateKeyOneBytesNoChecksum); 
     const auto publicKeyOne = privateKeyOne.getPublicKey(TWPublicKeyTypeSECP256k1);
     const auto addressOne = Address(publicKeyOne); // hopefully comes out as X-avax18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u
@@ -36,8 +35,7 @@ TEST(AvalancheSigner, SignWithLocktimeThreshold) {
     std::vector<Address> spendableAddresses = {addressOne, addressOne, addressOne, addressOne, addressOne, addressOne, addressOne, addressOne, addressOne, addressOne};
 
     auto blockchainID = CB58::avalanche.decode("2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed");
-    // we just want the first 32 bytes
-    Data blockchainIDBytes(blockchainID.begin(), blockchainID.begin() + 32);
+    Data blockchainIDBytes(blockchainID.begin(), blockchainID.begin() + 32); // we just want the first 32 bytes, no checksum
     uint32_t netID = 12345;
     auto assetID = parse_hex("0xdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db"); 
     uint32_t baseTypeID = 0;
