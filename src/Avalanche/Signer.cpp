@@ -108,6 +108,25 @@ std::vector<TransferableOutput> structToOutputs(const google::protobuf::Repeated
     return outputs;
 }
 
+uint64_t load_bigendian_uint64(void const* bytes) {
+    uint64_t result;
+    std::copy(
+        static_cast<unsigned char const*>(bytes),
+        static_cast<unsigned char const*>(bytes) + sizeof result,
+        std::reverse_iterator<unsigned char*>(reinterpret_cast<unsigned char*>(&result + 1))
+        );
+    return result;
+}
+uint64_t load_bigendian_uint32(void const* bytes) {
+    uint32_t result;
+    std::copy(
+        static_cast<unsigned char const*>(bytes),
+        static_cast<unsigned char const*>(bytes) + sizeof result,
+        std::reverse_iterator<unsigned char*>(reinterpret_cast<unsigned char*>(&result + 1))
+        );
+    return result;
+}
+
 std::vector<TransferableOp> structToOperations(google::protobuf::RepeatedPtrField<TW::Avalanche::Proto::TransferableOp> opsStruct) noexcept {
     std::vector<TransferableOp> ops;
     for (auto &op : opsStruct) {
@@ -158,16 +177,34 @@ std::vector<TransferableOp> structToOperations(google::protobuf::RepeatedPtrFiel
                 auto groupID = txnOp.group_id();
                 auto payload = Data(txnOp.payload().begin(), txnOp.payload().end());
                 std::vector<Output> outputs;
-                for (auto &output : txnOp.outputs()) {
-                    auto outputBytes = Data(output.begin(), output.end());
+                for (auto &outputStruct : txnOp.outputs()) {
+                    auto outputBytes = Data(outputStruct.begin(), outputStruct.end());
                     // parse uint64 locktime
+                    auto locktimeBytes = Data(outputBytes.begin(), outputBytes.begin() + 8);
+                    auto locktime = load_bigendian_uint64(static_cast<void*>(locktimeBytes.data()));
                     // parse uint32 threshold
+                    auto thresholdBytes = Data(outputBytes.begin() + 9, outputBytes.begin() + 9 + 4);
+                    auto threshold = load_bigendian_uint32(static_cast<void*>(thresholdBytes.data()));
                     // parse uint32 number of addresses
+                    auto addrCountBytes = Data(outputBytes.begin() + 14, outputBytes.begin() + 14 + 4);
+                    auto addrCount = load_bigendian_uint32(static_cast<void*>(addrCountBytes.data()));
                     // parse addresses out
-                    // make tuple and call outputs.push_back
-                }
+                    auto addrBytes = Data(outputBytes.begin() + 19, outputBytes.end());
+                    std::vector<Address> addrs; 
+                    for (auto i = 0; i < addrCount; ++i) {
+                        auto length = PublicKey::secp256k1Size;
+                        auto offset = i * length;
+                        auto byteSlice = Data(addrBytes.begin() + offset, addrBytes.begin() + offset + length);
+                        auto pubkeyData = Data(byteSlice.begin(), byteSlice.end());
+                        auto pubkey = PublicKey(pubkeyData, TWPublicKeyTypeSECP256k1);
+                        auto addr = Address(pubkey);
+                    }
+                    // end parsing addrs out
+                    auto output = std::make_tuple(locktime, threshold, addrs);
+                    outputs.push_back(output);
+                } // end loop building Outputs
                 auto transactionOp = NFTMintOperation(addressIndices, groupID, payload, outputs);
-                auto transferableOp = TransferableOp(assetID, utxoIDs, &transactionOp);
+                auto transferableOp = TransferableOp(assetID, utxoIDs, transactionOp);
                 ops.push_back(transferableOp);
                 break;
             }
@@ -184,7 +221,7 @@ std::vector<TransferableOp> structToOperations(google::protobuf::RepeatedPtrFiel
                 auto addresses = structToAddresses(txnOp.addresses());
                 auto nftTransfer = NFTTransferOutput(groupID, payload, locktime, threshold, addresses);
                 auto transactionOp = NFTTransferOperation(addressIndices, nftTransfer);
-                auto transferableOp = TransferableOp(assetID, utxoIDs, &transactionOp);
+                auto transferableOp = TransferableOp(assetID, utxoIDs, transactionOp);
                 ops.push_back(transferableOp);
                 break;
             }
