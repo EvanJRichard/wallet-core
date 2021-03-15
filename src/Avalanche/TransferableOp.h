@@ -47,7 +47,7 @@ class TransferableOp {
 };
 
 
-class SECP256k1MintOperation : TransactionOp {
+class SECP256k1MintOperation : public TransactionOp {
   private:
     uint32_t typeID = 8;
   public: 
@@ -63,7 +63,7 @@ class SECP256k1MintOperation : TransactionOp {
     void encode (Data& data) const;
 };
 
-class NFTMintOperation : TransactionOp {
+class NFTMintOperation : public TransactionOp {
   private:
     uint32_t typeID = 12;
     std::vector<Output> Outputs; 
@@ -82,7 +82,7 @@ class NFTMintOperation : TransactionOp {
     void encode (Data& data) const;
 };
 
-class NFTTransferOperation : TransactionOp {
+class NFTTransferOperation : public TransactionOp {
   private:
     uint32_t typeID = 13;
   public: 
