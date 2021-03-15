@@ -69,12 +69,18 @@ message SECP256K1MintOperation {
     SECP256K1TransferOutput transfer_output = 4;  // size(transfer_output)
 }
 
+message NftMintOpOutput {
+    uint64 locktime = 1;
+    uint32 threshold = 2;
+    repeated bytes addresses = 3;
+}
+
 message NFTMintOp {
     uint32 typeID = 1;                   // 04 bytes
     repeated uint32 address_indices = 2; // 04 bytes + 04 bytes * len(address_indices)
     uint32 group_id = 3;                 // 04 bytes
     bytes payload = 4;                   // 04 bytes + len(payload)
-    repeated bytes outputs = 5;          // 04 bytes + size(outputs)
+    repeated NftMintOpOutput outputs = 5;          // 04 bytes + size(outputs)
 }
 
 message NFTTransferOp {
