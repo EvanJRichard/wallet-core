@@ -184,7 +184,6 @@ message TransferMessage {
     string to = 2;
 }
 
-// TODO: Input data necessary to create a signed transaction.
 message SigningInput {
     repeated bytes private_keys = 1;
     
