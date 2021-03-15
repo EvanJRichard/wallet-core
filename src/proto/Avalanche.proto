@@ -9,17 +9,6 @@ syntax = "proto3";
 package TW.Avalanche.Proto;
 option java_package = "wallet.core.jni.proto";
 
-message UTXOID {
-    bytes tx_id = 1;       // 32 bytes
-    uint32 utxo_index = 2; // 04 bytes
-}
-
-message TransferableOp {
-    bytes asset_id = 1;           // 32 bytes
-    repeated UTXOID utxo_ids = 2; // 4 + 36 * len(utxo_ids) bytes
-    TransferOp transfer_op = 3;   // size(transfer_op)
-}
-
 message SECP256K1TransferOutput {
     uint32 typeID = 1;            // 04 bytes
     uint64 amount = 2;            // 08 bytes
@@ -106,6 +95,17 @@ message TransferOp {
     }
 }
 
+message UTXOID {
+    bytes tx_id = 1;       // 32 bytes
+    uint32 utxo_index = 2; // 04 bytes
+}
+
+message TransferableOp {
+    bytes asset_id = 1;           // 32 bytes
+    repeated UTXOID utxo_ids = 2; // 4 + 36 * len(utxo_ids) bytes
+    TransferOp transfer_op = 3;   // size(transfer_op)
+}
+
 message TransferableOutput {
     bytes asset_id = 1; // 32 bytes
     TransactionOutput output = 2;  // size(output)
@@ -143,7 +143,7 @@ message CreateAssetTx {
 
 message OperationTx {
     BaseTx base_tx = 1;          // size(base_tx)
-    repeated TransferOp ops = 2; // 4 bytes + size(ops)
+    repeated TransferableOp ops = 2; // 4 bytes + size(ops)
 }
 
 message ImportTx {
