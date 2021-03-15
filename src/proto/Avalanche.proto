@@ -116,6 +116,7 @@ message TransferableInput {
     uint32 utxo_index = 2; // 04 bytes
     bytes asset_id = 3;    // 32 bytes
     TransactionInput input = 4;       // size(input)
+    repeated bytes spendable_addresses = 5; // not encoded. represented as pubkeys.
 }
 
 message InitialState {
@@ -177,21 +178,10 @@ message SignedTx {
     UnsignedTx unsigned_tx = 2;          // size(unsigned_tx)
     repeated Credential credentials = 3; // 4 bytes + size(credentials)
 }
-
-// TODO: typical balance transfer, add more fields needed to sign
-message TransferMessage {
-    int64 amount = 1;
-    string to = 2;
-}
-
 message SigningInput {
     repeated bytes private_keys = 1;
     
     UnsignedTx input_tx = 2; 
-
-    oneof message_oneof {
-        TransferMessage transfer = 3; // TODO can we remove this oneof or is this a necessary TW interface
-    }
 }
 
 // Transaction signing output.
