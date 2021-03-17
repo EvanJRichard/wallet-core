@@ -8,6 +8,8 @@
 #include "proto/Avalanche.pb.h"
 #include <TrustWalletCore/TWAnySigner.h>
 #include "HexCoding.h"
+#include "Avalanche/CB58.h"
+#include "PrivateKey.h"
 
 #include "../interface/TWTestUtilities.h"
 #include <gtest/gtest.h>
@@ -15,43 +17,86 @@
 using namespace TW;
 using namespace TW::Avalanche;
 
-
-/* example test from Algorand
-
-TEST(TWAnySignerAlgorand, Sign) {
-    auto privateKey = parse_hex("d5b43d706ef0cb641081d45a2ec213b5d8281f439f2425d1af54e2afdaabf55b");
-    auto note = parse_hex("68656c6c6f");
-    auto genesisHash = Base64::decode("wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=");
-    
-    Proto::SigningInput input;
-    auto &transaction = *input.mutable_transaction_pay();
-    transaction.set_to_address("CRLADAHJZEW2GFY2UPEHENLOGCUOU74WYSTUXQLVLJUJFHEUZOHYZNWYR4");
-    transaction.set_fee(263000ull);
-    transaction.set_amount(1000000000000ull);
-    transaction.set_first_round(1937767ull);
-    transaction.set_last_round(1938767ull);
-    input.set_genesis_id("mainnet-v1.0");
-    input.set_genesis_hash(genesisHash.data(), genesisHash.size());
-    input.set_note(note.data(), note.size());
-    input.set_private_key(privateKey.data(), privateKey.size());
-
-    Proto::SigningOutput output;
-    ANY_SIGN(input, TWCoinTypeAlgorand);
-
-    ASSERT_EQ(hex(output.encoded()), "82a3736967c440baa00062adcdcb5875e4435cdc6885d26bfe5308ab17983c0fda790b7103051fcb111554e5badfc0ac7edf7e1223a434342a9eeed5cdb047690827325051560ba374786e8aa3616d74cf000000e8d4a51000a3666565ce00040358a26676ce001d9167a367656eac6d61696e6e65742d76312e30a26768c420c061c4d8fc1dbdded2d7604be4568e3f6d041987ac37bde4b620b5ab39248adfa26c76ce001d954fa46e6f7465c40568656c6c6fa3726376c42014560180e9c92da3171aa3c872356e30a8ea7f96c4a74bc1755a68929c94cb8fa3736e64c42061bf060efc02e2887dfffc8ed85268c8c091c013eedf315bc50794d02a8791ada474797065a3706179");
-}
-*/
-
-
 TEST(TWAnySignerAvalanche, Sign) {
-    // auto privateKey = parse_hex("d5b43d706ef0cb641081d45a2ec213b5d8281f439f2425d1af54e2afdaabf55b");
+    const auto privateKeyBytes = CB58::avalanche.decode("ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN");
+    const std::vector<uint8_t> privateKeyBytesNoChecksum(privateKeyBytes.begin(), privateKeyBytes.begin() + 32); // we just want the first 32 bytes
+    const auto privateKey = PrivateKey(privateKeyBytesNoChecksum); 
+    const auto publicKey = privateKey.getPublicKey(TWPublicKeyTypeSECP256k1);
     
+    auto blockchainID = CB58::avalanche.decode("2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed");
+    Data blockchainIDBytes(blockchainID.begin(), blockchainID.begin() + 32); // we just want the first 32 bytes, no checksum
+    uint32_t netID = 12345;
+    auto assetID = "0xdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db";
+    auto assetIDBytes = parse_hex(assetID); 
+    Data memo = {0xde, 0xad, 0xbe, 0xef};
+    auto threshold = 1;
+
     Proto::SigningInput input;
-    // basically need to set everything in Input.
+
     // keep in mind the expected formats in Signer!
+    // for example, addresses are expected as secp pubkey, not avalanche-formatted address
+    input.add_private_keys();
+    input.set_private_keys(0, privateKeyBytesNoChecksum.data(), privateKeyBytesNoChecksum.size());
+    auto &inputTx = *input.mutable_input_tx();
+    auto &baseTx = *inputTx.mutable_base_tx();
+    baseTx.set_typeid_(0);
+    baseTx.set_network_id(netID);
+    baseTx.set_blockchain_id(blockchainIDBytes.data(), blockchainIDBytes.size());
+    baseTx.set_memo(memo.data(), memo.size());
+    
+    auto coreInputOne = new Proto::SECP256K1TransferInput();
+    coreInputOne->set_amount(123456789);
+    coreInputOne->add_address_indices(3);
+    coreInputOne->add_address_indices(7);
+    auto wrappedInputOne = new Proto::TransactionInput();
+    wrappedInputOne->set_allocated_secp_transfer_input(coreInputOne);
+    auto inputOne = baseTx.add_inputs();
+    inputOne->set_utxo_index(5);
+    inputOne->set_tx_id("0xf1e1d1c1b1a191817161514131211101f0e0d0c0b0a090807060504030201000");
+    inputOne->set_asset_id(assetID);
+    for (auto i = 0; i < 8; ++i) {
+        inputOne->add_spendable_addresses();
+        inputOne->set_spendable_addresses(i, publicKey.bytes.data(), publicKey.bytes.size());
+    }
+    inputOne->set_allocated_input(wrappedInputOne);
+    auto coreInputTwo = new Proto::SECP256K1TransferInput();
+    coreInputTwo->set_amount(123456789);
+    coreInputTwo->add_address_indices(3);
+    coreInputTwo->add_address_indices(7);
+    auto wrappedInputTwo = new Proto::TransactionInput();
+    wrappedInputTwo->set_allocated_secp_transfer_input(coreInputTwo);
+    auto inputTwo = baseTx.add_inputs();
+    inputTwo->set_utxo_index(5);
+    inputTwo->set_tx_id("0xf1e1d1c1b1a191817161514131211101f0e0d0c0b0a090807060504030201000");
+    inputTwo->set_asset_id(assetID);
+    for (auto i = 0; i < 8; ++i) {
+        inputTwo->add_spendable_addresses();
+        inputTwo->set_spendable_addresses(i, publicKey.bytes.data(), publicKey.bytes.size());
+    }
+    inputTwo->set_allocated_input(wrappedInputTwo);
+
+    auto coreOutputOne = new Proto::SECP256K1TransferOutput();
+    coreOutputOne->set_amount(12345);
+    coreOutputOne->set_locktime(54321);
+    coreOutputOne->set_threshold(threshold);
+    auto wrappedOutputOne = new Proto::TransactionOutput();
+    wrappedOutputOne->set_allocated_secp_transfer_output(coreOutputOne);
+    auto outputOne = baseTx.add_outputs();
+    outputOne->set_asset_id(assetID);
+    outputOne->set_allocated_output(wrappedOutputOne);
+
+    auto coreOutputTwo = new Proto::SECP256K1TransferOutput();
+    coreOutputTwo->set_amount(12345);
+    coreOutputTwo->set_locktime(54321);
+    coreOutputTwo->set_threshold(threshold);
+    auto wrappedOutputTwo = new Proto::TransactionOutput();
+    wrappedOutputTwo->set_allocated_secp_transfer_output(coreOutputTwo);
+    auto outputTwo = baseTx.add_outputs();
+    outputTwo->set_asset_id(assetID);
+    outputTwo->set_allocated_output(wrappedOutputTwo);
 
     Proto::SigningOutput output;
-    ANY_SIGN(input, TWCoinTypeAvalanche);
+    ANY_SIGN(input, TWCoinTypeAvalanche); // this line causes a "bus error"
 
     ASSERT_EQ(hex(output.encoded()), "00000000000000003039d891ad56056d9c01f18f43f58b5c784ad07a4a49cf3d1f11623804b5cba2c6bf00000002dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db0000000700000000000003e8000000000000000000000001000000013cb7d3842e8cee6a0ebd09f1fe884f6861e1b29cdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db000000070000000000003039000000000000d43100000001000000013cb7d3842e8cee6a0ebd09f1fe884f6861e1b29c00000002f1e1d1c1b1a191817161514131211101f0e0d0c0b0a09080706050403020100000000005dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db0000000500000000075bcd15000000020000000300000007f1e1d1c1b1a191817161514131211101f0e0d0c0b0a09080706050403020100000000005dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db0000000500000000075bcd1500000002000000030000000700000004deadbeef00000002000000090000000244ef527f47cab3ed82eb267c27c04869e46531b05db643f5bc97da21148afe161f17634a90f4e22adb810b472062f7e809dde19059fa7048f9972a481fe9390d0044ef527f47cab3ed82eb267c27c04869e46531b05db643f5bc97da21148afe161f17634a90f4e22adb810b472062f7e809dde19059fa7048f9972a481fe9390d00000000090000000244ef527f47cab3ed82eb267c27c04869e46531b05db643f5bc97da21148afe161f17634a90f4e22adb810b472062f7e809dde19059fa7048f9972a481fe9390d0044ef527f47cab3ed82eb267c27c04869e46531b05db643f5bc97da21148afe161f17634a90f4e22adb810b472062f7e809dde19059fa7048f9972a481fe9390d00");
 }
