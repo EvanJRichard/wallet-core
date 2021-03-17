@@ -108,25 +108,6 @@ std::vector<TransferableOutput> structToOutputs(const google::protobuf::Repeated
     return outputs;
 }
 
-uint64_t load_bigendian_uint64(void const* bytes) {
-    uint64_t result;
-    std::copy(
-        static_cast<unsigned char const*>(bytes),
-        static_cast<unsigned char const*>(bytes) + sizeof result,
-        std::reverse_iterator<unsigned char*>(reinterpret_cast<unsigned char*>(&result + 1))
-        );
-    return result;
-}
-uint64_t load_bigendian_uint32(void const* bytes) {
-    uint32_t result;
-    std::copy(
-        static_cast<unsigned char const*>(bytes),
-        static_cast<unsigned char const*>(bytes) + sizeof result,
-        std::reverse_iterator<unsigned char*>(reinterpret_cast<unsigned char*>(&result + 1))
-        );
-    return result;
-}
-
 std::vector<TransferableOp> structToOperations(google::protobuf::RepeatedPtrField<TW::Avalanche::Proto::TransferableOp> opsStruct) noexcept {
     std::vector<TransferableOp> ops;
     for (auto &op : opsStruct) {
