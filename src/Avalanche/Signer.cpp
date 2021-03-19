@@ -233,7 +233,7 @@ UnsignedCreateAssetTransaction buildCreateAssetTx(const Proto::SigningInput &inp
         // this gives std::vector<TransferableOutput>. need std::vector<TransactionOutput*>.
         std::vector<TransactionOutput*> outputPointers;
         for (auto &output : outputs) {
-            outputPointers.push_back(output.Output);
+            outputPointers.push_back(output.Output->duplicate());
         }
         auto initialState = InitialState(fxID, outputPointers);
         initialStates.push_back(initialState);
