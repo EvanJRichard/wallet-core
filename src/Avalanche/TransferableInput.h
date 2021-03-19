@@ -17,9 +17,9 @@ class TransactionInput{
     virtual std::vector<uint32_t> getAddressIndices() const = 0;
     virtual uint32_t getTypeID() const = 0;
     virtual void encode (Data& data) const = 0; //we want to enforce that all subclasses can encode
+    virtual ~TransactionInput() {}
   protected:
     TransactionInput() {}
-    virtual ~TransactionInput() {}
 };
 
 /// Avalanche transaction input.
@@ -40,8 +40,9 @@ class TransferableInput {
            std::sort(SpendableAddresses.begin(), SpendableAddresses.end());
          }
 
-    
     bool operator<(const TransferableInput& other) const;
+
+    ~TransferableInput();
 };
 
 

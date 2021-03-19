@@ -32,6 +32,11 @@ bool TransferableOutput::operator<(const TransferableOutput& other) const {
     other.encode(otherData);
     return std::lexicographical_compare(thisData.begin(), thisData.end(), otherData.begin(), otherData.end());
 }
+
+TransferableOutput::~TransferableOutput() {
+    // clean up pointer data members
+    delete Output;
+}
       
 
 void SECP256k1TransferOutput::encode(Data& data) const {

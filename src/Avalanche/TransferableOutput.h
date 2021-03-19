@@ -19,9 +19,9 @@ class TransactionOutput {
 
     bool operator<(const TransactionOutput& other) const;
 
+    virtual ~TransactionOutput(){}
   protected:
     TransactionOutput(){}
-    virtual ~TransactionOutput(){}
 };
 
 /// Avalanche transaction output.
@@ -38,6 +38,7 @@ class TransferableOutput {
     
     bool operator<(const TransferableOutput& other) const;
       
+    ~TransferableOutput();
 };
 
 

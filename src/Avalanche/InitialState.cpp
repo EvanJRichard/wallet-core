@@ -25,3 +25,10 @@ bool InitialState::operator<(const InitialState& other) const {
     other.encode(otherData);
     return std::lexicographical_compare(thisData.begin(), thisData.end(), otherData.begin(), otherData.end());
 }
+
+InitialState::~InitialState() {
+    // clean up pointer data members
+    for (auto output : Outputs) {
+        delete output;
+    }
+}

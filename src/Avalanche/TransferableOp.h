@@ -17,9 +17,9 @@ class TransactionOp {
   public:
     /// Encodes the op into the provided buffer.
     virtual void encode(Data& data) const = 0;  //we want to enforce that all subclasses can encode
+    virtual ~TransactionOp(){}
   protected:
     TransactionOp(){}
-    virtual ~TransactionOp(){}
 };
 
 /// Avalanche transaction operation.
@@ -44,6 +44,8 @@ class TransferableOp {
       }
 
     bool operator<(const TransferableOp& other) const;
+    
+    ~TransferableOp();
 };
 
 
@@ -71,7 +73,6 @@ class NFTMintOperation : public TransactionOp {
     std::vector<uint32_t> AddressIndices;
     uint32_t GroupID;
     Data Payload;
-
 
     NFTMintOperation(std::vector<uint32_t> &addressIndices, uint32_t groupID, Data &payload, std::vector<Output> &outputs)
     : AddressIndices(addressIndices), GroupID(groupID), Payload(payload), Outputs(outputs) {

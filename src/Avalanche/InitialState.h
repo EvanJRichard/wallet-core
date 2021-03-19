@@ -26,6 +26,7 @@ namespace TW::Avalanche {
         void encode(Data& data) const;
 
         bool operator<(const InitialState& other) const;
-    };
 
+        ~InitialState();
+    };
 } // namespace TW::Avalanche

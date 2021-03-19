@@ -39,6 +39,11 @@ bool TransferableOp::operator<(const TransferableOp& other) const {
     return std::lexicographical_compare(thisData.begin(), thisData.end(), otherData.begin(), otherData.end());
 }
 
+TransferableOp::~TransferableOp() {
+    // clean up pointer data members
+    delete TransferOp;
+}
+
 void SECP256k1MintOperation::encode(Data& data) const {
     encode32BE(typeID, data);
     encode32BE(AddressIndices.size(), data);
