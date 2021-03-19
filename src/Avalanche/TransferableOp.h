@@ -38,8 +38,8 @@ class TransferableOp {
     /// Encodes the op into the provided buffer.
     void encode(Data& data) const;
 
-    TransferableOp(Data &assetID, std::vector<UTXOID> &utxoIDs, TransactionOp &transferOp)
-      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(&transferOp) {
+    TransferableOp(Data &assetID, std::vector<UTXOID> &utxoIDs, TransactionOp *transferOp)
+      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(transferOp) {
         std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
       }
 

@@ -33,8 +33,8 @@ class TransferableOutput {
     /// Encodes the output into the provided buffer.
     void encode(Data& data) const;
 
-    TransferableOutput(Data &assetID, TransactionOutput &output)
-      : AssetID(assetID), Output(&output) {}
+    TransferableOutput(Data &assetID, TransactionOutput *output)
+      : AssetID(assetID), Output(output) {}
     
     bool operator<(const TransferableOutput& other) const;
       
