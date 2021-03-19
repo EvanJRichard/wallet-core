@@ -18,6 +18,7 @@ class TransactionInput{
     virtual uint32_t getTypeID() const = 0;
     virtual void encode (Data& data) const = 0; //we want to enforce that all subclasses can encode
     virtual ~TransactionInput() {}
+    virtual TransactionInput* duplicate() = 0;
   protected:
     TransactionInput() {}
 };
@@ -39,6 +40,14 @@ class TransferableInput {
          {
            std::sort(SpendableAddresses.begin(), SpendableAddresses.end());
          }
+
+    TransferableInput(const TransferableInput& other) {
+      TxID = other.TxID;
+      UTXOIndex = other.UTXOIndex;
+      AssetID = other.AssetID;
+      Input = other.Input->duplicate();
+      SpendableAddresses = other.SpendableAddresses;
+    }
 
     bool operator<(const TransferableInput& other) const;
 
@@ -63,6 +72,11 @@ class SECP256k1TransferInput : public TransactionInput {
 
     std::vector<uint32_t> getAddressIndices() const {return AddressIndices;}
     uint32_t getTypeID() const {return TypeID;}
+
+    TransactionInput* duplicate() {
+      auto dup = new SECP256k1TransferInput(Amount, AddressIndices);
+      return dup;
+    }
 };
 
 } // namespace TW::Avalanche

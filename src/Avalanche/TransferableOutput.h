@@ -20,6 +20,8 @@ class TransactionOutput {
     bool operator<(const TransactionOutput& other) const;
 
     virtual ~TransactionOutput(){}
+
+    virtual TransactionOutput* duplicate() = 0; 
   protected:
     TransactionOutput(){}
 };
@@ -35,6 +37,11 @@ class TransferableOutput {
 
     TransferableOutput(Data &assetID, TransactionOutput *output)
       : AssetID(assetID), Output(output) {}
+
+    TransferableOutput(const TransferableOutput& other) {
+      AssetID = other.AssetID;
+      Output = other.Output->duplicate();
+    }
     
     bool operator<(const TransferableOutput& other) const;
       
@@ -58,6 +65,11 @@ class SECP256k1TransferOutput : public TransactionOutput {
       }
   
     void encode (Data& data) const;
+
+    TransactionOutput* duplicate() {
+      auto dup = new SECP256k1TransferOutput(Amount, Locktime, Threshold, Addresses);
+      return dup;
+    }
 };
 
 
@@ -75,6 +87,11 @@ class SECP256k1MintOutput : public TransactionOutput {
       }
   
     void encode (Data& data) const;
+
+    TransactionOutput* duplicate() {
+      auto dup = new SECP256k1MintOutput(Locktime, Threshold, Addresses);
+      return dup;
+    }
 };
 
 class NFTTransferOutput : public TransactionOutput {
@@ -94,6 +111,11 @@ class NFTTransferOutput : public TransactionOutput {
       }
   
     void encode (Data& data) const;
+
+    TransactionOutput* duplicate() {
+      auto dup = new NFTTransferOutput(GroupID, Payload, Locktime, Threshold, Addresses);
+      return dup;
+    }
 };
 
 class NFTMintOutput : public TransactionOutput {
@@ -112,6 +134,11 @@ class NFTMintOutput : public TransactionOutput {
       }
   
     void encode (Data& data) const;
+
+    TransactionOutput* duplicate() {
+      auto dup = new NFTMintOutput(GroupID, Locktime, Threshold, Addresses);
+      return dup;
+    }
 };
 
 } // namespace TW::Avalanche

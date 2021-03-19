@@ -18,6 +18,7 @@ class TransactionOp {
     /// Encodes the op into the provided buffer.
     virtual void encode(Data& data) const = 0;  //we want to enforce that all subclasses can encode
     virtual ~TransactionOp(){}
+    virtual TransactionOp* duplicate() = 0;
   protected:
     TransactionOp(){}
 };
@@ -43,6 +44,13 @@ class TransferableOp {
         std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
       }
 
+    TransferableOp(const TransferableOp& other) {
+      UTXOIDs = other.UTXOIDs;
+      std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
+      AssetID = other.AssetID;
+      TransferOp = other.TransferOp->duplicate();
+    }
+
     bool operator<(const TransferableOp& other) const;
     
     ~TransferableOp();
@@ -63,6 +71,11 @@ class SECP256k1MintOperation : public TransactionOp {
       }
 
     void encode (Data& data) const;
+
+    TransactionOp* duplicate() {
+      auto dup = new SECP256k1MintOperation(AddressIndices, MintOutput, TransferOutput);
+      return dup;
+    }
 };
 
 class NFTMintOperation : public TransactionOp {
@@ -81,6 +94,11 @@ class NFTMintOperation : public TransactionOp {
     }
 
     void encode (Data& data) const;
+
+    TransactionOp* duplicate() {
+      auto dup = new NFTMintOperation(AddressIndices, GroupID, Payload, Outputs);
+      return dup;
+    }
 };
 
 class NFTTransferOperation : public TransactionOp {
@@ -97,6 +115,11 @@ class NFTTransferOperation : public TransactionOp {
       }
 
     void encode (Data& data) const;
+
+    TransactionOp* duplicate() {
+      auto dup = new NFTTransferOperation(AddressIndices, TransferOutput);
+      return dup;
+    }
 };
 
 } // namespace TW::Avalanche
