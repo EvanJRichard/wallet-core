@@ -51,6 +51,8 @@ class TransferableInput {
 
     bool operator<(const TransferableInput& other) const;
 
+    TransferableInput& operator=(const TransferableInput& other);
+
     ~TransferableInput();
 };
 

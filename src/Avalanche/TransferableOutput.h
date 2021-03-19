@@ -43,6 +43,8 @@ class TransferableOutput {
       Output = other.Output->duplicate();
     }
     
+    TransferableOutput& operator=(const TransferableOutput& other);
+
     bool operator<(const TransferableOutput& other) const;
       
     ~TransferableOutput();

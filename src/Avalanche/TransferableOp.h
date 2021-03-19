@@ -52,6 +52,8 @@ class TransferableOp {
     }
 
     bool operator<(const TransferableOp& other) const;
+
+    TransferableOp& operator=(const TransferableOp& other);
     
     ~TransferableOp();
 };

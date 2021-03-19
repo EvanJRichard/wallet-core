@@ -32,6 +32,8 @@ namespace TW::Avalanche {
           std::sort(Outputs.begin(), Outputs.end());          
         }
 
+        InitialState& operator=(const InitialState &other);
+
         /// Encodes the InitialState into the provided buffer.
         void encode(Data& data) const;
 
