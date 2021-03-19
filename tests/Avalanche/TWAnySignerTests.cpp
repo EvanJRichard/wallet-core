@@ -27,8 +27,11 @@ TEST(TWAnySignerAvalanche, Sign) {
     Data blockchainIDBytes(blockchainID.begin(), blockchainID.begin() + 32); // we just want the first 32 bytes, no checksum
     uint32_t netID = 12345;
     auto assetID = "0xdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db";
-    auto assetIDBytes = parse_hex(assetID); 
+    auto assetIDBytes = parse_hex(assetID);
+    auto txIDBytes = parse_hex("0xf1e1d1c1b1a191817161514131211101f0e0d0c0b0a090807060504030201000"); 
     Data memo = {0xde, 0xad, 0xbe, 0xef};
+    auto amount = 1000;   
+    auto locktime = 0;
     auto threshold = 1;
 
     Proto::SigningInput input;
@@ -52,8 +55,8 @@ TEST(TWAnySignerAvalanche, Sign) {
     wrappedInputOne->set_allocated_secp_transfer_input(coreInputOne);
     auto inputOne = baseTx.add_inputs();
     inputOne->set_utxo_index(5);
-    inputOne->set_tx_id("0xf1e1d1c1b1a191817161514131211101f0e0d0c0b0a090807060504030201000");
-    inputOne->set_asset_id(assetID);
+    inputOne->set_tx_id(txIDBytes.data(), txIDBytes.size());
+    inputOne->set_asset_id(assetIDBytes.data(), assetIDBytes.size());
     for (auto i = 0; i < 8; ++i) {
         inputOne->add_spendable_addresses();
         inputOne->set_spendable_addresses(i, publicKey.bytes.data(), publicKey.bytes.size());
@@ -67,8 +70,8 @@ TEST(TWAnySignerAvalanche, Sign) {
     wrappedInputTwo->set_allocated_secp_transfer_input(coreInputTwo);
     auto inputTwo = baseTx.add_inputs();
     inputTwo->set_utxo_index(5);
-    inputTwo->set_tx_id("0xf1e1d1c1b1a191817161514131211101f0e0d0c0b0a090807060504030201000");
-    inputTwo->set_asset_id(assetID);
+    inputTwo->set_tx_id(txIDBytes.data(), txIDBytes.size());
+    inputTwo->set_asset_id(assetIDBytes.data(), assetIDBytes.size());
     for (auto i = 0; i < 8; ++i) {
         inputTwo->add_spendable_addresses();
         inputTwo->set_spendable_addresses(i, publicKey.bytes.data(), publicKey.bytes.size());
@@ -79,20 +82,24 @@ TEST(TWAnySignerAvalanche, Sign) {
     coreOutputOne->set_amount(12345);
     coreOutputOne->set_locktime(54321);
     coreOutputOne->set_threshold(threshold);
+    coreOutputOne->add_addresses();
+    coreOutputOne->set_addresses(0, publicKey.bytes.data(), publicKey.bytes.size());
     auto wrappedOutputOne = new Proto::TransactionOutput();
     wrappedOutputOne->set_allocated_secp_transfer_output(coreOutputOne);
     auto outputOne = baseTx.add_outputs();
-    outputOne->set_asset_id(assetID);
+    outputOne->set_asset_id(assetIDBytes.data(), assetIDBytes.size());
     outputOne->set_allocated_output(wrappedOutputOne);
 
     auto coreOutputTwo = new Proto::SECP256K1TransferOutput();
-    coreOutputTwo->set_amount(12345);
-    coreOutputTwo->set_locktime(54321);
+    coreOutputTwo->set_amount(amount);
+    coreOutputTwo->set_locktime(locktime);
     coreOutputTwo->set_threshold(threshold);
+    coreOutputTwo->add_addresses();
+    coreOutputTwo->set_addresses(0, publicKey.bytes.data(), publicKey.bytes.size());    
     auto wrappedOutputTwo = new Proto::TransactionOutput();
     wrappedOutputTwo->set_allocated_secp_transfer_output(coreOutputTwo);
     auto outputTwo = baseTx.add_outputs();
-    outputTwo->set_asset_id(assetID);
+    outputTwo->set_asset_id(assetIDBytes.data(), assetIDBytes.size());
     outputTwo->set_allocated_output(wrappedOutputTwo);
 
     Proto::SigningOutput output;
