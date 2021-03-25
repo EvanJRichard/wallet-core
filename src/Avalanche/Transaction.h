@@ -31,8 +31,6 @@ class BaseTransaction {
                     std::vector<TransferableInput>& inputs,
                     std::vector<TransferableOutput>& outputs, Data& memo)
         : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Memo(memo) {
-        // TODO guard rails and validation would be nice here; for example BlockchainID must be 32
-        // bytes; assetID must be 4 bytes, networkID 4 bytes.
         if (blockchainID.size() != 32) {
             throw std::invalid_argument("BlockchainID must be 32 bytes.");
         }
