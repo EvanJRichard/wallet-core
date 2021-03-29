@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -44,8 +44,6 @@ TransferableOp& TransferableOp::operator=(const TransferableOp &other) {
     if (this == &other) {
         return *this;
     } else {
-        // clean up pointer data members
-        delete TransferOp;
         // assign members
         UTXOIDs = other.UTXOIDs;
         std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
@@ -53,11 +51,6 @@ TransferableOp& TransferableOp::operator=(const TransferableOp &other) {
         TransferOp = other.TransferOp->duplicate();
         return *this;
     }
-}
-
-TransferableOp::~TransferableOp() {
-    // clean up pointer data members
-    delete TransferOp;
 }
 
 void SECP256k1MintOperation::encode(Data& data) const {

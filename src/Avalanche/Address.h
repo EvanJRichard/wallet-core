@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -18,8 +18,8 @@ namespace TW::Avalanche {
 class Address : public Bech32Address {
 private:
     void extractKeyHashFromString (const std::string& string);
-    static const size_t hashLen;
 public:
+    static const size_t hashLen;
     static const std::string hrp;
 
     static bool isValid(const std::string& addr);

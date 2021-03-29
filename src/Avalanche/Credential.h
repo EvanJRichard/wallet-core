@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -7,8 +7,14 @@
 #pragma once
 #include "../Data.h"
 
+
 namespace TW::Avalanche {
 
+    enum CredentialTypeID {
+      SECPCred = 9,
+      NFTCred = 14
+    };
+    
     class Credential {
       public: 
         uint32_t TypeID;
@@ -27,13 +33,13 @@ namespace TW::Avalanche {
     class SECP256k1Credential : public Credential {
       public:
         SECP256k1Credential(std::vector<Data> &sigs)
-        : Credential(9, sigs) {}
+        : Credential(CredentialTypeID::SECPCred, sigs) {}
     };
 
     class NFTCredential : public Credential {
       public:
         NFTCredential(std::vector<Data> &sigs)
-        : Credential(14, sigs) {}
+        : Credential(CredentialTypeID::NFTCred, sigs) {}
     };
 
 } // namespace TW::Avalanche

@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -12,6 +12,13 @@
 
 namespace TW::Avalanche {
 
+enum TransactionOutputTypeID {
+  SECPTransferOut = 7,
+  SECPMint = 6,
+  NFTTransferOut = 11,
+  NFTMintOut = 10
+};
+
 class TransactionOutput {
   public:
     /// Encodes the output into the provided buffer.
@@ -21,7 +28,7 @@ class TransactionOutput {
 
     virtual ~TransactionOutput(){}
 
-    virtual TransactionOutput* duplicate() = 0; 
+    virtual std::unique_ptr<TransactionOutput> duplicate() = 0; 
   protected:
     TransactionOutput(){}
 };
@@ -30,13 +37,13 @@ class TransactionOutput {
 class TransferableOutput {
   public:
     Data AssetID;
-    TransactionOutput* Output;
+    std::unique_ptr<TransactionOutput> Output;
 
     /// Encodes the output into the provided buffer.
     void encode(Data& data) const;
 
-    TransferableOutput(Data &assetID, TransactionOutput *output)
-      : AssetID(assetID), Output(output) {}
+    TransferableOutput(Data &assetID, std::unique_ptr<TransactionOutput> output)
+      : AssetID(assetID), Output(std::move(output)) {}
 
     TransferableOutput(const TransferableOutput& other) {
       AssetID = other.AssetID;
@@ -46,13 +53,11 @@ class TransferableOutput {
     TransferableOutput& operator=(const TransferableOutput& other);
 
     bool operator<(const TransferableOutput& other) const;
-      
-    ~TransferableOutput();
 };
 
 
 class SECP256k1TransferOutput : public TransactionOutput {
-  const uint32_t typeID = 7;
+  const uint32_t typeID = TransactionOutputTypeID::SECPTransferOut;
   
   public:
     uint64_t Amount;
@@ -68,15 +73,15 @@ class SECP256k1TransferOutput : public TransactionOutput {
   
     void encode (Data& data) const;
 
-    TransactionOutput* duplicate() {
-      auto dup = new SECP256k1TransferOutput(Amount, Locktime, Threshold, Addresses);
+    std::unique_ptr<TransactionOutput> duplicate() {
+      auto dup = std::make_unique<SECP256k1TransferOutput>(Amount, Locktime, Threshold, Addresses);
       return dup;
     }
 };
 
 
 class SECP256k1MintOutput : public TransactionOutput {
-  const uint32_t typeID = 6;
+  const uint32_t typeID = TransactionOutputTypeID::SECPMint;
   
   public:
     uint64_t Locktime;
@@ -90,14 +95,14 @@ class SECP256k1MintOutput : public TransactionOutput {
   
     void encode (Data& data) const;
 
-    TransactionOutput* duplicate() {
-      auto dup = new SECP256k1MintOutput(Locktime, Threshold, Addresses);
+    std::unique_ptr<TransactionOutput> duplicate() {
+      auto dup = std::make_unique<SECP256k1MintOutput>(Locktime, Threshold, Addresses);
       return dup;
     }
 };
 
 class NFTTransferOutput : public TransactionOutput {
-  const uint32_t typeID = 11;
+  const uint32_t typeID = TransactionOutputTypeID::NFTTransferOut;
   
   public:
     uint32_t GroupID;
@@ -114,14 +119,14 @@ class NFTTransferOutput : public TransactionOutput {
   
     void encode (Data& data) const;
 
-    TransactionOutput* duplicate() {
-      auto dup = new NFTTransferOutput(GroupID, Payload, Locktime, Threshold, Addresses);
+    std::unique_ptr<TransactionOutput> duplicate() {
+      auto dup = std::make_unique<NFTTransferOutput>(GroupID, Payload, Locktime, Threshold, Addresses);
       return dup;
     }
 };
 
 class NFTMintOutput : public TransactionOutput {
-  const uint32_t typeID = 10;
+  const uint32_t typeID = TransactionOutputTypeID::NFTMintOut;
   
   public:
     uint32_t GroupID;
@@ -137,8 +142,8 @@ class NFTMintOutput : public TransactionOutput {
   
     void encode (Data& data) const;
 
-    TransactionOutput* duplicate() {
-      auto dup = new NFTMintOutput(GroupID, Locktime, Threshold, Addresses);
+    std::unique_ptr<TransactionOutput> duplicate() {
+      auto dup = std::make_unique<NFTMintOutput>(GroupID, Locktime, Threshold, Addresses);
       return dup;
     }
 };

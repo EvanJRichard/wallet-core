@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -13,12 +13,18 @@
 
 namespace TW::Avalanche {
 
+enum OperationTypeID {
+  SECPMintOp = 8,
+  NFTMintOp = 12,
+  NFTTransferOp = 13
+};
+
 class TransactionOp {
   public:
     /// Encodes the op into the provided buffer.
     virtual void encode(Data& data) const = 0;  //we want to enforce that all subclasses can encode
     virtual ~TransactionOp(){}
-    virtual TransactionOp* duplicate() = 0;
+    virtual std::unique_ptr<TransactionOp> duplicate() = 0;
   protected:
     TransactionOp(){}
 };
@@ -34,13 +40,13 @@ class TransferableOp {
     static bool sortUTXOIDs(UTXOID lhs, UTXOID rhs);
   public:
     Data AssetID;
-    TransactionOp* TransferOp;
+    std::unique_ptr<TransactionOp> TransferOp;
 
     /// Encodes the op into the provided buffer.
     void encode(Data& data) const;
 
-    TransferableOp(Data &assetID, std::vector<UTXOID> &utxoIDs, TransactionOp *transferOp)
-      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(transferOp) {
+    TransferableOp(Data &assetID, std::vector<UTXOID> &utxoIDs, std::unique_ptr<TransactionOp> transferOp)
+      : AssetID(assetID), UTXOIDs(utxoIDs), TransferOp(std::move(transferOp)) {
         std::sort(UTXOIDs.begin(), UTXOIDs.end(), sortUTXOIDs);
       }
 
@@ -55,13 +61,12 @@ class TransferableOp {
 
     TransferableOp& operator=(const TransferableOp& other);
     
-    ~TransferableOp();
 };
 
 
 class SECP256k1MintOperation : public TransactionOp {
   private:
-    uint32_t typeID = 8;
+    uint32_t typeID = OperationTypeID::SECPMintOp;
   public: 
     std::vector<uint32_t> AddressIndices;
     SECP256k1MintOutput MintOutput;
@@ -74,15 +79,15 @@ class SECP256k1MintOperation : public TransactionOp {
 
     void encode (Data& data) const;
 
-    TransactionOp* duplicate() {
-      auto dup = new SECP256k1MintOperation(AddressIndices, MintOutput, TransferOutput);
+    std::unique_ptr<TransactionOp> duplicate() {
+      auto dup = std::make_unique<SECP256k1MintOperation>(AddressIndices, MintOutput, TransferOutput);
       return dup;
     }
 };
 
 class NFTMintOperation : public TransactionOp {
   private:
-    uint32_t typeID = 12;
+    uint32_t typeID = OperationTypeID::NFTMintOp;
     std::vector<Output> Outputs; 
   public: 
     std::vector<uint32_t> AddressIndices;
@@ -97,15 +102,15 @@ class NFTMintOperation : public TransactionOp {
 
     void encode (Data& data) const;
 
-    TransactionOp* duplicate() {
-      auto dup = new NFTMintOperation(AddressIndices, GroupID, Payload, Outputs);
+    std::unique_ptr<TransactionOp> duplicate() {
+      auto dup = std::make_unique<NFTMintOperation>(AddressIndices, GroupID, Payload, Outputs);
       return dup;
     }
 };
 
 class NFTTransferOperation : public TransactionOp {
   private:
-    uint32_t typeID = 13;
+    uint32_t typeID = OperationTypeID::NFTTransferOp;
   public: 
     std::vector<uint32_t> AddressIndices;
     NFTTransferOutput TransferOutput;
@@ -118,8 +123,8 @@ class NFTTransferOperation : public TransactionOp {
 
     void encode (Data& data) const;
 
-    TransactionOp* duplicate() {
-      auto dup = new NFTTransferOperation(AddressIndices, TransferOutput);
+    std::unique_ptr<TransactionOp> duplicate() {
+      auto dup = std::make_unique<NFTTransferOperation>(AddressIndices, TransferOutput);
       return dup;
     }
 };

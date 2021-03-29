@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -41,8 +41,6 @@ TransferableInput& TransferableInput::operator=(const TransferableInput &other) 
     if (this == &other) {
         return *this;
     } else {
-        // clean up pointer data members
-        delete Input;
         // assign members
         TxID = other.TxID;
         UTXOIndex = other.UTXOIndex;
@@ -51,11 +49,6 @@ TransferableInput& TransferableInput::operator=(const TransferableInput &other) 
         SpendableAddresses = other.SpendableAddresses;
         return *this;
     }
-}
-
-TransferableInput::~TransferableInput() {
-    // clean up pointer data members
-    delete Input;
 }
 
 void SECP256k1TransferInput::encode(Data& data) const {

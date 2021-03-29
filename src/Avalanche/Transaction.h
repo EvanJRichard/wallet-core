@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -20,6 +20,14 @@ const int BLOCKCHAIN_ID_SIZE = 32;
 const int MAX_MEMO_SIZE = 256;
 const int MAX_ASSET_NAME_CHARS = 128;
 const int MAX_SYMBOL_CHARS = 4;
+
+  enum TransactionTypeID {
+  Base = 0,
+  CreateAsset = 1,
+  Operation = 2, 
+  Import = 3,
+  Export = 4
+};
 
 class BaseTransaction {
   public:
@@ -65,7 +73,7 @@ class UnsignedCreateAssetTransaction : public BaseTransaction {
                                    std::vector<TransferableOutput>& outputs, Data& memo,
                                    std::string& name, std::string& symbol, uint8_t denomination,
                                    std::vector<InitialState>& states)
-      : BaseTransaction(1, networkID, blockchainID, inputs, outputs, memo)
+      : BaseTransaction(TransactionTypeID::CreateAsset, networkID, blockchainID, inputs, outputs, memo)
       , Name(name)
       , Symbol(symbol)
       , Denomination(denomination)
@@ -80,6 +88,7 @@ class UnsignedCreateAssetTransaction : public BaseTransaction {
       }
       std::sort(InitialStates.begin(), InitialStates.end());
     }
+
 
     UnsignedCreateAssetTransaction(BaseTransaction& baseTxn, std::string& name, std::string& symbol,
                                    uint8_t denomination, std::vector<InitialState>& states)
@@ -96,6 +105,7 @@ class UnsignedCreateAssetTransaction : public BaseTransaction {
         throw std::invalid_argument(std::string("Symbol must be no longer than ") +
                                     std::to_string(MAX_SYMBOL_CHARS) + " characters.");
       }
+      TypeID = TransactionTypeID::CreateAsset;
       std::sort(InitialStates.begin(), InitialStates.end());
     }
 };
@@ -110,13 +120,14 @@ class UnsignedOperationTransaction : public BaseTransaction {
                                  std::vector<TransferableInput>& inputs,
                                  std::vector<TransferableOutput>& outputs, Data& memo,
                                  std::vector<TransferableOp>& ops)
-      : BaseTransaction(2, networkID, blockchainID, inputs, outputs, memo), Operations(ops) {
+      : BaseTransaction(TransactionTypeID::Operation, networkID, blockchainID, inputs, outputs, memo), Operations(ops) {
       std::sort(Operations.begin(), Operations.end());
     }
 
     UnsignedOperationTransaction(BaseTransaction& baseTxn, std::vector<TransferableOp>& ops)
       : BaseTransaction(baseTxn), Operations(ops) {
       std::sort(Operations.begin(), Operations.end());
+      TypeID = TransactionTypeID::Operation;
     }
 };
 
@@ -131,7 +142,7 @@ class UnsignedImportTransaction : public BaseTransaction {
                               std::vector<TransferableInput>& inputs,
                               std::vector<TransferableOutput>& outputs, Data& memo, Data& source,
                               std::vector<TransferableInput>& importInputs)
-      : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
+      : BaseTransaction(TransactionTypeID::Import, networkID, blockchainID, inputs, outputs, memo)
       , SourceChain(source)
       , ImportInputs(importInputs) {
       if (source.size() != BLOCKCHAIN_ID_SIZE) {
@@ -148,6 +159,7 @@ class UnsignedImportTransaction : public BaseTransaction {
         throw std::invalid_argument(std::string("SourceChain must be ") +
                                     std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
       }
+      TypeID = TransactionTypeID::Import;
       std::sort(ImportInputs.begin(), ImportInputs.end());
     }
 };
@@ -163,7 +175,7 @@ class UnsignedExportTransaction : public BaseTransaction {
                               std::vector<TransferableInput>& inputs,
                               std::vector<TransferableOutput>& outputs, Data& memo, Data& dest,
                               std::vector<TransferableOutput>& exportOutputs)
-      : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
+      : BaseTransaction(TransactionTypeID::Export, networkID, blockchainID, inputs, outputs, memo)
       , DestinationChain(dest)
       , ExportOutputs(exportOutputs) {
       if (dest.size() != BLOCKCHAIN_ID_SIZE) {
@@ -180,13 +192,14 @@ class UnsignedExportTransaction : public BaseTransaction {
         throw std::invalid_argument(std::string("DestinationChain must be ") +
                                     std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
       }
+      TypeID = TransactionTypeID::Export;
       std::sort(ExportOutputs.begin(), ExportOutputs.end());
     }
 };
 
 class SignedTransaction {
   public:
-    const uint16_t CodecID = 0; // TODO EJR x-chain is on codecID 1 now but docs are on 0
+    const uint16_t CodecID = 0;
     BaseTransaction UnsignedTransaction;
     std::vector<Credential> Credentials;
 

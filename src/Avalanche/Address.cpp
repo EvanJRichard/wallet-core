@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -12,13 +12,16 @@
 
 using namespace TW::Avalanche;
 
-const std::string Address::hrp = HRP_AVALANCHE;
+const std::string Address::hrp = HRP_AVALANCHEX;
 const size_t Address::hashLen = 20;
 
 bool Address::isValid(const std::string& string) {
     // split into before and after - 
     auto hyphenPos = string.find("-");
     if (hyphenPos == std::string::npos) {
+        return false;
+    }
+    if (hyphenPos == 0) {
         return false;
     }
     auto chainID = string.substr(hyphenPos - 1, 1);

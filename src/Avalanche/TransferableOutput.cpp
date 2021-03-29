@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2021 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -39,18 +39,11 @@ TransferableOutput& TransferableOutput::operator=(const TransferableOutput &othe
     if (this == &other) {
         return *this;
     } else {
-        // clean up pointer data members
-        delete Output;
         // assign members
         AssetID = other.AssetID;
         Output = other.Output->duplicate();
         return *this;
     }
-}
-
-TransferableOutput::~TransferableOutput() {
-    // clean up pointer data members
-    delete Output;
 }
       
 
