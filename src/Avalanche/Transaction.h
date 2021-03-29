@@ -35,19 +35,19 @@ class BaseTransaction {
     BaseTransaction(uint32_t typeID, uint32_t networkID, Data& blockchainID,
                     std::vector<TransferableInput>& inputs,
                     std::vector<TransferableOutput>& outputs, Data& memo)
-        : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Memo(memo) {
-        if (blockchainID.size() != BLOCKCHAIN_ID_SIZE) {
-            throw std::invalid_argument(std::string("BlockchainID must be ") +
-                                        std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
-        }
-        if (memo.size() > MAX_MEMO_SIZE) {
-            throw std::invalid_argument(std::string("Memo must be no longer than ") +
-                                        std::to_string(MAX_MEMO_SIZE) + " bytes.");
-        }
-        Inputs = inputs;
-        Outputs = outputs;
-        std::sort(Inputs.begin(), Inputs.end());
-        std::sort(Outputs.begin(), Outputs.end());
+      : TypeID(typeID), NetworkID(networkID), BlockchainID(blockchainID), Memo(memo) {
+      if (blockchainID.size() != BLOCKCHAIN_ID_SIZE) {
+        throw std::invalid_argument(std::string("BlockchainID must be ") +
+                                    std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
+      }
+      if (memo.size() > MAX_MEMO_SIZE) {
+        throw std::invalid_argument(std::string("Memo must be no longer than ") +
+                                    std::to_string(MAX_MEMO_SIZE) + " bytes.");
+      }
+      Inputs = inputs;
+      Outputs = outputs;
+      std::sort(Inputs.begin(), Inputs.end());
+      std::sort(Outputs.begin(), Outputs.end());
     }
 };
 
@@ -65,38 +65,38 @@ class UnsignedCreateAssetTransaction : public BaseTransaction {
                                    std::vector<TransferableOutput>& outputs, Data& memo,
                                    std::string& name, std::string& symbol, uint8_t denomination,
                                    std::vector<InitialState>& states)
-        : BaseTransaction(1, networkID, blockchainID, inputs, outputs, memo)
-        , Name(name)
-        , Symbol(symbol)
-        , Denomination(denomination)
-        , InitialStates(states) {
-        if (name.size() > MAX_ASSET_NAME_CHARS) {
-            throw std::invalid_argument(std::string("Name must be no longer than ") +
-                                        std::to_string(MAX_ASSET_NAME_CHARS) + " characters.");
-        }
-        if (symbol.size() > MAX_SYMBOL_CHARS) {
-            throw std::invalid_argument(std::string("Symbol must be no longer than ") +
-                                        std::to_string(MAX_SYMBOL_CHARS) + " characters.");
-        }
-        std::sort(InitialStates.begin(), InitialStates.end());
+      : BaseTransaction(1, networkID, blockchainID, inputs, outputs, memo)
+      , Name(name)
+      , Symbol(symbol)
+      , Denomination(denomination)
+      , InitialStates(states) {
+      if (name.size() > MAX_ASSET_NAME_CHARS) {
+        throw std::invalid_argument(std::string("Name must be no longer than ") +
+                                    std::to_string(MAX_ASSET_NAME_CHARS) + " characters.");
+      }
+      if (symbol.size() > MAX_SYMBOL_CHARS) {
+        throw std::invalid_argument(std::string("Symbol must be no longer than ") +
+                                    std::to_string(MAX_SYMBOL_CHARS) + " characters.");
+      }
+      std::sort(InitialStates.begin(), InitialStates.end());
     }
 
     UnsignedCreateAssetTransaction(BaseTransaction& baseTxn, std::string& name, std::string& symbol,
                                    uint8_t denomination, std::vector<InitialState>& states)
-        : BaseTransaction(baseTxn)
-        , Name(name)
-        , Symbol(symbol)
-        , Denomination(denomination)
-        , InitialStates(states) {
-        if (name.size() > MAX_ASSET_NAME_CHARS) {
-            throw std::invalid_argument(std::string("Name must be no longer than ") +
-                                        std::to_string(MAX_ASSET_NAME_CHARS) + " characters.");
-        }
-        if (symbol.size() > MAX_SYMBOL_CHARS) {
-            throw std::invalid_argument(std::string("Symbol must be no longer than ") +
-                                        std::to_string(MAX_SYMBOL_CHARS) + " characters.");
-        }
-        std::sort(InitialStates.begin(), InitialStates.end());
+      : BaseTransaction(baseTxn)
+      , Name(name)
+      , Symbol(symbol)
+      , Denomination(denomination)
+      , InitialStates(states) {
+      if (name.size() > MAX_ASSET_NAME_CHARS) {
+        throw std::invalid_argument(std::string("Name must be no longer than ") +
+                                    std::to_string(MAX_ASSET_NAME_CHARS) + " characters.");
+      }
+      if (symbol.size() > MAX_SYMBOL_CHARS) {
+        throw std::invalid_argument(std::string("Symbol must be no longer than ") +
+                                    std::to_string(MAX_SYMBOL_CHARS) + " characters.");
+      }
+      std::sort(InitialStates.begin(), InitialStates.end());
     }
 };
 
@@ -110,13 +110,13 @@ class UnsignedOperationTransaction : public BaseTransaction {
                                  std::vector<TransferableInput>& inputs,
                                  std::vector<TransferableOutput>& outputs, Data& memo,
                                  std::vector<TransferableOp>& ops)
-        : BaseTransaction(2, networkID, blockchainID, inputs, outputs, memo), Operations(ops) {
-        std::sort(Operations.begin(), Operations.end());
+      : BaseTransaction(2, networkID, blockchainID, inputs, outputs, memo), Operations(ops) {
+      std::sort(Operations.begin(), Operations.end());
     }
 
     UnsignedOperationTransaction(BaseTransaction& baseTxn, std::vector<TransferableOp>& ops)
-        : BaseTransaction(baseTxn), Operations(ops) {
-        std::sort(Operations.begin(), Operations.end());
+      : BaseTransaction(baseTxn), Operations(ops) {
+      std::sort(Operations.begin(), Operations.end());
     }
 };
 
@@ -131,24 +131,24 @@ class UnsignedImportTransaction : public BaseTransaction {
                               std::vector<TransferableInput>& inputs,
                               std::vector<TransferableOutput>& outputs, Data& memo, Data& source,
                               std::vector<TransferableInput>& importInputs)
-        : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
-        , SourceChain(source)
-        , ImportInputs(importInputs) {
-        if (source.size() != BLOCKCHAIN_ID_SIZE) {
-            throw std::invalid_argument(std::string("SourceChain must be ") +
-                                        std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
-        }
-        std::sort(ImportInputs.begin(), ImportInputs.end());
+      : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
+      , SourceChain(source)
+      , ImportInputs(importInputs) {
+      if (source.size() != BLOCKCHAIN_ID_SIZE) {
+        throw std::invalid_argument(std::string("SourceChain must be ") +
+                                    std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
+      }
+      std::sort(ImportInputs.begin(), ImportInputs.end());
     }
 
     UnsignedImportTransaction(BaseTransaction& baseTxn, Data& source,
                               std::vector<TransferableInput> importInputs)
-        : BaseTransaction(baseTxn), SourceChain(source), ImportInputs(importInputs) {
-        if (source.size() != BLOCKCHAIN_ID_SIZE) {
-            throw std::invalid_argument(std::string("SourceChain must be ") +
-                                        std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
-        }
-        std::sort(ImportInputs.begin(), ImportInputs.end());
+      : BaseTransaction(baseTxn), SourceChain(source), ImportInputs(importInputs) {
+      if (source.size() != BLOCKCHAIN_ID_SIZE) {
+        throw std::invalid_argument(std::string("SourceChain must be ") +
+                                    std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
+      }
+      std::sort(ImportInputs.begin(), ImportInputs.end());
     }
 };
 
@@ -163,24 +163,24 @@ class UnsignedExportTransaction : public BaseTransaction {
                               std::vector<TransferableInput>& inputs,
                               std::vector<TransferableOutput>& outputs, Data& memo, Data& dest,
                               std::vector<TransferableOutput>& exportOutputs)
-        : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
-        , DestinationChain(dest)
-        , ExportOutputs(exportOutputs) {
-        if (dest.size() != BLOCKCHAIN_ID_SIZE) {
-            throw std::invalid_argument(std::string("DestinationChain must be ") +
-                                        std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
-        }
-        std::sort(ExportOutputs.begin(), ExportOutputs.end());
+      : BaseTransaction(3, networkID, blockchainID, inputs, outputs, memo)
+      , DestinationChain(dest)
+      , ExportOutputs(exportOutputs) {
+      if (dest.size() != BLOCKCHAIN_ID_SIZE) {
+        throw std::invalid_argument(std::string("DestinationChain must be ") +
+                                    std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
+      }
+      std::sort(ExportOutputs.begin(), ExportOutputs.end());
     }
 
     UnsignedExportTransaction(BaseTransaction& baseTxn, Data& dest,
                               std::vector<TransferableOutput>& exportOutputs)
-        : BaseTransaction(baseTxn), DestinationChain(dest), ExportOutputs(exportOutputs) {
-        if (dest.size() != BLOCKCHAIN_ID_SIZE) {
-            throw std::invalid_argument(std::string("DestinationChain must be ") +
-                                        std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
-        }
-        std::sort(ExportOutputs.begin(), ExportOutputs.end());
+      : BaseTransaction(baseTxn), DestinationChain(dest), ExportOutputs(exportOutputs) {
+      if (dest.size() != BLOCKCHAIN_ID_SIZE) {
+        throw std::invalid_argument(std::string("DestinationChain must be ") +
+                                    std::to_string(BLOCKCHAIN_ID_SIZE) + " bytes.");
+      }
+      std::sort(ExportOutputs.begin(), ExportOutputs.end());
     }
 };
 
@@ -193,7 +193,7 @@ class SignedTransaction {
     void encode(Data& data) const;
 
     SignedTransaction(BaseTransaction& txn, std::vector<Credential>& credentials)
-        : UnsignedTransaction(txn), Credentials(credentials) {}
+      : UnsignedTransaction(txn), Credentials(credentials) {}
 };
 
 } // namespace TW::Avalanche
