@@ -62,11 +62,7 @@ This list is generated from [./coins.json](../coins.json)
 | 2718    | Nebulas          | NAS    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/nebulas/info/logo.png" width="32" />      | <https://nebulas.io>          |
 | 6060    | GoChain          | GO     | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/gochain/info/logo.png" width="32" />      | <https://gochain.io>          |
 | 8964    | NULS             | NULS   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/nuls/info/logo.png" width="32" />         | <https://nuls.io>             |
-<<<<<<< HEAD
 | 9000    | Avalanche X Chain | AVAX   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchex/info/logo.png" width="32" />   | <https://www.avalabs.org/>    |
-=======
-| 31337   | Avalanche        | AVAX   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanche/info/logo.png" width="32" />    | <https://www.avalabs.org/>    |
->>>>>>> master
 | 19167   | Zelcash          | FLUX   | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/zelcash/info/logo.png" width="32" />      | <https://runonflux.io>        |
 | 5718350 | Wanchain         | WAN    | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/wanchain/info/logo.png" width="32" />     | <https://wanchain.org>        |
 | 5741564 | Waves            | WAVES  | <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/waves/info/logo.png" width="32" />        | <https://wavesplatform.com>   |
