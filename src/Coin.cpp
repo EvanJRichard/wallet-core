@@ -167,9 +167,14 @@ CoinEntry* coinDispatcher(TWCoinType coinType) {
         case TWCoinTypeZcash: entry = &zcashDP; break;
         case TWCoinTypeZelcash: entry = &zcashDP; break;
         case TWCoinTypeZilliqa: entry = &zilliqaDP; break;
+<<<<<<< HEAD
         case TWCoinTypePolygon: entry = &ethereumDP; break;
         case TWCoinTypeAvalancheXChain: entry = &avalancheDP; break;
         case TWCoinTypeAvalancheCChain: entry = &ethereumDP; break;
+=======
+        case TWCoinTypeAvalanche: entry = &AvalancheDP; break;
+        case TWCoinTypePolygon: entry = &ethereumDP; break;
+>>>>>>> master
         // end_of_coin_dipatcher_switch_marker_do_not_modify
 
         default: entry = nullptr; break;

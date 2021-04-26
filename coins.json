@@ -1545,10 +1545,17 @@
       "clientDocs": "https://eth.wiki/json-rpc/API"
     }
   },
+<<<<<<< HEAD
   {
     "id": "avalanchex",
     "name": "Avalanche X Chain",
     "coinId": 9000,
+=======
+   {
+    "id": "avalanche",
+    "name": "Avalanche",
+    "coinId": 31337,
+>>>>>>> master
     "symbol": "AVAX", 
     "decimals": 9,
     "hrp": "avax",
@@ -1570,6 +1577,7 @@
       "clientDocs": "https://docs.avax.network/"
    }
   },
+<<<<<<< HEAD
   {
     "id": "avalanchec",
     "name": "Avalanche C Chain",
@@ -1594,6 +1602,8 @@
     "clientDocs": "https://docs.avax.network/"
    }
   },
+=======
+>>>>>>> master
   {
     "id": "polygon",
     "name": "Polygon",
